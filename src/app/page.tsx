@@ -74,7 +74,7 @@ export default function Home() {
             alt="Floral ornament left"
             fill
             sizes="(max-width: 768px) 160px, 256px"
-            className="object-contain object-left-top"
+            className="object-contain object-left-top scale-x-[-1]"
           />
         </div>
 
@@ -85,13 +85,10 @@ export default function Home() {
             alt="Floral ornament right"
             fill
             sizes="(max-width: 768px) 160px, 256px"
-            className="object-contain object-left-top scale-x-[-1]"
+            className="object-contain object-left-top"
           />
         </div>
 
-        {/* Bottom Corner ornaments */}
-        <CornerOrnament position="bl" />
-        <CornerOrnament position="br" />
 
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
