@@ -1,6 +1,13 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
+import { UnifrakturMaguntia } from "next/font/google";
+
+const gothicFont = UnifrakturMaguntia({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
 import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
@@ -93,8 +100,7 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
           <h1 
-            className="text-6xl md:text-8xl lg:text-9xl font-normal leading-tight py-2"
-            style={{ fontFamily: "'Snell Roundhand', 'Pinyon Script', cursive" }}
+            className={`text-6xl md:text-8xl lg:text-9xl font-normal leading-tight py-2 ${gothicFont.className}`}
           >
             Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
