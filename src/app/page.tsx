@@ -6,28 +6,6 @@ import { ReservationModal } from "@/components/ReservationModal";
 import type { Gift } from "@/lib/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const RoseSVG = () => (
-  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" className="w-full h-full" aria-hidden="true">
-    <g opacity="0.85">
-      <ellipse cx="60" cy="68" rx="28" ry="18" fill="#7c1f35" opacity="0.7" />
-      <ellipse cx="60" cy="62" rx="22" ry="15" fill="#8a2236" opacity="0.8" />
-      <ellipse cx="52" cy="56" rx="16" ry="11" fill="#9b2d42" opacity="0.9" />
-      <ellipse cx="68" cy="54" rx="14" ry="10" fill="#9b2d42" opacity="0.85" />
-      <ellipse cx="44" cy="62" rx="13" ry="9" fill="#8a2236" opacity="0.75" />
-      <ellipse cx="76" cy="60" rx="13" ry="9" fill="#8a2236" opacity="0.75" />
-      <ellipse cx="60" cy="48" rx="12" ry="9" fill="#b03050" opacity="0.9" />
-      <ellipse cx="56" cy="44" rx="9" ry="7" fill="#c0364e" opacity="0.9" />
-      <ellipse cx="64" cy="42" rx="9" ry="7" fill="#c0364e" opacity="0.85" />
-      <ellipse cx="60" cy="38" rx="7" ry="6" fill="#d44060" opacity="0.95" />
-      <ellipse cx="60" cy="34" rx="5" ry="4" fill="#e05070" opacity="1" />
-      <ellipse cx="38" cy="72" rx="10" ry="14" fill="#3a6b2a" opacity="0.7" transform="rotate(-20,38,72)" />
-      <ellipse cx="82" cy="74" rx="10" ry="14" fill="#3a6b2a" opacity="0.65" transform="rotate(20,82,74)" />
-      <line x1="60" y1="86" x2="60" y2="105" stroke="#2e5222" strokeWidth="3" strokeLinecap="round" />
-      <ellipse cx="50" cy="97" rx="9" ry="12" fill="#3a6b2a" opacity="0.6" transform="rotate(-15,50,97)" />
-    </g>
-  </svg>
-);
-
 const CornerOrnament = ({ position }: { position: "tl" | "tr" | "bl" | "br" }) => {
   const transforms: Record<string, string> = {
     tl: "",
@@ -94,15 +72,12 @@ export default function Home() {
         <CornerOrnament position="bl" />
         <CornerOrnament position="br" />
 
-        {/* Rose decoration */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 md:w-24 md:h-24 -translate-y-1/3 z-10 pointer-events-none">
-          <RoseSVG />
-        </div>
+
 
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
-            Helloísa <span className="text-primary italic">&amp;</span> Héber
+            Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
           <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4">
             <span className="w-12 h-px bg-border" />
@@ -189,7 +164,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-12 text-center border-t border-border/30 text-muted-foreground">
-        <p className="font-serif italic text-lg text-primary">Com amor, Heloísa &amp; Héber</p>
+        <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
       </footer>
 
       {/* Modals */}
