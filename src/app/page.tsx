@@ -102,7 +102,7 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
-            Helloísa <span className="text-primary italic">&amp;</span> Héber
+            Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
           <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4">
             <span className="w-12 h-px bg-border" />
@@ -189,7 +189,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-12 text-center border-t border-border/30 text-muted-foreground">
-        <p className="font-serif italic text-lg text-primary">Com amor, Heloísa &amp; Héber</p>
+        <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
       </footer>
 
       {/* Modals */}
