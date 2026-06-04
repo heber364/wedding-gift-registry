@@ -1,60 +1,27 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
-import { UnifrakturMaguntia } from "next/font/google";
+import dynamic from "next/dynamic";
 
-const gothicFont = UnifrakturMaguntia({
-  weight: "400",
-  subsets: ["latin"],
-  display: "swap",
-});
+// @ts-ignore - suppress TS deep import error
+
 import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import type { Gift } from "@/lib/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const CornerOrnament = ({ position }: { position: "tl" | "tr" | "bl" | "br" }) => {
-  const transforms: Record<string, string> = {
-    tl: "",
-    tr: "scale(-1,1)",
-    bl: "scale(1,-1)",
-    br: "scale(-1,-1)",
-  };
-  return (
-    <svg
-      viewBox="0 0 80 80"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-16 h-16 md:w-20 md:h-20 absolute"
-      style={{
-        top: position.startsWith("t") ? 0 : "auto",
-        bottom: position.startsWith("b") ? 0 : "auto",
-        left: position.endsWith("l") ? 0 : "auto",
-        right: position.endsWith("r") ? 0 : "auto",
-      }}
-      aria-hidden="true"
-    >
-      <g transform={`translate(${position.endsWith("r") ? 80 : 0},${position.startsWith("b") ? 80 : 0}) ${transforms[position]}`} opacity="0.45" stroke="#9b2d42" strokeWidth="1.2" fill="none">
-        <path d="M2,2 L2,30" strokeLinecap="round" />
-        <path d="M2,2 L30,2" strokeLinecap="round" />
-        <path d="M2,2 Q18,18 38,2" strokeLinecap="round" opacity="0.6" />
-        <path d="M2,2 Q18,18 2,38" strokeLinecap="round" opacity="0.6" />
-        <circle cx="2" cy="2" r="2" fill="#9b2d42" opacity="0.8" />
-        <circle cx="30" cy="2" r="1.2" fill="#9b2d42" opacity="0.5" />
-        <circle cx="2" cy="30" r="1.2" fill="#9b2d42" opacity="0.5" />
-        <path d="M10,2 Q14,10 18,2" opacity="0.4" />
-        <path d="M2,10 Q10,14 2,18" opacity="0.4" />
-      </g>
-    </svg>
-  );
-};
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
 export default function Home() {
+  const [url, setUrl] = useState<string>('https://www.youtube.com/watch?v=rPVA3qA9jYI');
+
   const { data: gifts, isLoading } = useListGifts();
   const { data: summary } = useGetGiftsSummary();
 
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const categories = useMemo(() => {
     if (!gifts) return [];
@@ -99,9 +66,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
-          <h1 
-            className={`text-6xl md:text-8xl lg:text-9xl font-normal leading-tight py-2 ${gothicFont.className}`}
-          >
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
             Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
           <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4">
@@ -114,6 +79,37 @@ export default function Home() {
             Nossa maior alegria é celebrar este momento com vocês.
             Caso queiram nos abençoar com um presente, preparamos esta lista com muito carinho.
           </p>
+
+          <div className="pt-8">
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className="group relative flex items-center justify-center gap-3 mx-auto px-8 py-3 border border-primary/40 bg-background/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-500 rounded-sm font-serif italic tracking-widest text-sm uppercase shadow-[0_0_15px_rgba(155,45,66,0.1)] hover:shadow-[0_0_25px_rgba(155,45,66,0.4)] backdrop-blur-sm"
+            >
+              {isPlaying ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
+                  Pausar Música
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 fill-current opacity-80 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Ouvir Trilha Sonora
+                </>
+              )}
+            </button>
+            <div className="absolute opacity-0 pointer-events-none w-0 h-0 overflow-hidden">
+              <ReactPlayer
+                src={url}
+                playing={isPlaying}
+                loop={true}
+                volume={0.5}
+                width="10px"
+                height="10px"
+              />
+            </div>
+          </div>
         </div>
       </header>
 
