@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
@@ -66,13 +67,29 @@ export default function Home() {
       <header className="relative py-24 md:py-32 flex flex-col items-center justify-center text-center px-4 border-b border-border/30 overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
 
-        {/* Corner ornaments */}
-        <CornerOrnament position="tl" />
-        <CornerOrnament position="tr" />
+        {/* Top left floral ornament */}
+        <div className="absolute -top-4 -left-4 w-40 h-40 md:w-56 md:h-56 z-10 pointer-events-none opacity-90 drop-shadow-sm">
+          <Image 
+            src="/image-from-rawpixel-id-16379032-png.png" 
+            alt="Floral ornament left" 
+            fill
+            className="object-contain object-left-top"
+          />
+        </div>
+
+        {/* Top right floral ornament */}
+        <div className="absolute -top-4 -right-4 w-40 h-40 md:w-56 md:h-56 z-10 pointer-events-none opacity-90 drop-shadow-sm">
+          <Image 
+            src="/image-from-rawpixel-id-16379032-png.png" 
+            alt="Floral ornament right" 
+            fill
+            className="object-contain object-left-top scale-x-[-1]"
+          />
+        </div>
+
+        {/* Bottom Corner ornaments */}
         <CornerOrnament position="bl" />
         <CornerOrnament position="br" />
-
-
 
         <div className="relative z-10 max-w-3xl space-y-6 pt-8">
           <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
