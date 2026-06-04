@@ -68,7 +68,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
 
         {/* Top left floral ornament */}
-        <div className="absolute -top-4 -left-4 w-40 h-40 md:w-56 md:h-56 z-10 pointer-events-none opacity-90 drop-shadow-sm">
+        <div className="absolute top-6 left-6 md:top-8 md:left-8 w-32 h-32 md:w-48 md:h-48 z-10 pointer-events-none opacity-90 drop-shadow-sm -rotate-90">
           <Image 
             src="/image-from-rawpixel-id-16379032-png.png" 
             alt="Floral ornament left" 
@@ -78,7 +78,7 @@ export default function Home() {
         </div>
 
         {/* Top right floral ornament */}
-        <div className="absolute -top-4 -right-4 w-40 h-40 md:w-56 md:h-56 z-10 pointer-events-none opacity-90 drop-shadow-sm">
+        <div className="absolute top-6 right-6 md:top-8 md:right-8 w-32 h-32 md:w-48 md:h-48 z-10 pointer-events-none opacity-90 drop-shadow-sm rotate-90">
           <Image 
             src="/image-from-rawpixel-id-16379032-png.png" 
             alt="Floral ornament right" 
