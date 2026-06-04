@@ -14,7 +14,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const adminPassword = process.env.ADMIN_PASSWORD ?? "admin123";
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword) {
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
 
     if (parsed.data.password !== adminPassword) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
