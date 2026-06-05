@@ -10,6 +10,15 @@ import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import type { Gift } from "@/lib/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type SortOption = "default" | "price-asc" | "price-desc";
 
 const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
@@ -21,6 +30,7 @@ export default function Home() {
 
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
+  const [sortOption, setSortOption] = useState<SortOption>("default");
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const categories = useMemo(() => {
@@ -31,9 +41,20 @@ export default function Home() {
 
   const filteredGifts = useMemo(() => {
     if (!gifts) return [];
-    if (activeCategory === "Todos") return gifts;
-    return gifts.filter((g) => g.category === activeCategory);
-  }, [gifts, activeCategory]);
+    let result = gifts;
+    
+    if (activeCategory !== "Todos") {
+      result = result.filter((g) => g.category === activeCategory);
+    }
+
+    if (sortOption === "price-asc") {
+      result = [...result].sort((a, b) => a.price - b.price);
+    } else if (sortOption === "price-desc") {
+      result = [...result].sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [gifts, activeCategory, sortOption]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -133,24 +154,43 @@ export default function Home() {
           </div>
         )}
 
-        {/* Category Tabs */}
-        {!isLoading && categories.length > 1 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`
-                  px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium border transition-all duration-300
-                  ${activeCategory === cat
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(138,28,48,0.3)]"
-                    : "bg-transparent text-muted-foreground border-border/40 hover:border-primary/50 hover:text-foreground"
-                  }
-                `}
-              >
-                {cat}
-              </button>
-            ))}
+        {/* Controls (Filter + Sort) */}
+        {!isLoading && (
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-12">
+            {/* Category Tabs */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-2 flex-1">
+              {categories.length > 1 && categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`
+                    px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium border transition-all duration-300
+                    ${activeCategory === cat
+                      ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(138,28,48,0.3)]"
+                      : "bg-transparent text-muted-foreground border-border/40 hover:border-primary/50 hover:text-foreground"
+                    }
+                  `}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Dropdown */}
+            {gifts && gifts.length > 0 && (
+              <div className="w-full sm:w-auto shrink-0 flex justify-end">
+                <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
+                  <SelectTrigger className="w-full sm:w-[220px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border/60">
+                    <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
+                    <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
+                    <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         )}
 

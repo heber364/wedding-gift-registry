@@ -19,7 +19,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
   return (
     <div
       className={`
-        group relative flex flex-col bg-card border border-border/40 overflow-hidden
+        group relative flex flex-col bg-card border border-border/40 overflow-hidden rounded-xl
         transition-all duration-500 ease-out
         ${isReserved && !isOwnReservation
           ? "opacity-55 grayscale-[0.4]"
@@ -112,7 +112,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
             onClick={(e) => e.stopPropagation()}
             className={`
               flex items-center justify-center gap-2 w-full py-2 text-xs uppercase tracking-widest font-medium
-              border border-border/40 text-muted-foreground
+              border border-border/40 text-muted-foreground rounded-md
               transition-all duration-300
               hover:border-primary/50 hover:text-primary hover:bg-primary/5
               ${isReserved && !isOwnReservation ? "pointer-events-none opacity-40" : ""}
