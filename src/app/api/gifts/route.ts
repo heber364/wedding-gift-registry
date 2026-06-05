@@ -21,13 +21,14 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     reservedBy: g.reservedBy ?? null,
     reservedByPhone: g.reservedByPhone ?? null,
     reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
+    isActive: g.isActive,
     createdAt: g.createdAt.toISOString(),
   };
 }
 
 export async function GET() {
   try {
-    const gifts = await db.select().from(giftsTable).orderBy(giftsTable.createdAt);
+    const gifts = await db.select().from(giftsTable).where(eq(giftsTable.isActive, true)).orderBy(giftsTable.createdAt);
     return NextResponse.json(gifts.map(serializeGift));
   } catch (err) {
     console.error("Failed to list gifts", err);
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
         creditLink: parsed.data.creditLink ?? null,
         productLink: parsed.data.productLink ?? null,
         category: parsed.data.category ?? null,
+        isActive: parsed.data.isActive ?? true,
       })
       .returning();
       

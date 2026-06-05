@@ -5,10 +5,12 @@ import {
   useGetGiftsSummary, 
   useDeleteGift, 
   useUnreserveGift,
+  useUpdateGift,
   getListGiftsQueryKey,
   getGetGiftsSummaryQueryKey
 } from "@/lib/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { customFetch } from "@/lib/api-client-react/custom-fetch";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { 
@@ -23,7 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
 import type { Gift } from "@/lib/api-client-react";
-import { Plus, Trash2, Edit2, Unlock, LogOut, Copy } from "lucide-react";
+import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard } from "lucide-react";
+import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
@@ -31,20 +34,54 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const { data: gifts, isLoading } = useListGifts();
-  const { data: summary } = useGetGiftsSummary();
+  const { data: gifts, isLoading } = useQuery({
+    queryKey: ["admin-gifts"],
+    queryFn: () => customFetch<Gift[]>("/api/gifts/admin"),
+  });
+  
+  const adminSummary = React.useMemo(() => {
+    if (!gifts) return null;
+    const total = gifts.length;
+    const reserved = gifts.filter((g) => g.isReserved).length;
+    return { total, reserved, available: total - reserved };
+  }, [gifts]);
   
   const deleteGift = useDeleteGift();
   const unreserveGift = useUnreserveGift();
+  const updateGift = useUpdateGift();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingGift, setEditingGift] = useState<Gift | null>(null);
   const [isDuplicate, setIsDuplicate] = useState(false);
+  const [testGift, setTestGift] = useState<Gift | null>(null);
+
+  const toggleVisibility = (gift: Gift) => {
+    updateGift.mutate(
+      { id: gift.id, data: { isActive: !gift.isActive } },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Sucesso",
+            description: `Presente ${!gift.isActive ? "exibido" : "ocultado"} com sucesso.`,
+          });
+          queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+          queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
+        },
+        onError: () => {
+          toast({
+            title: "Erro",
+            description: "Ocorreu um erro ao alterar a visibilidade do presente.",
+            variant: "destructive",
+          });
+        },
+      }
+    );
+  };
 
   useEffect(() => {
     // Check if authenticated
-    const isAuth = sessionStorage.getItem("adminAuth") === "true";
-    if (!isAuth) {
+    if (!sessionStorage.getItem("adminAuth")) {
       router.push("/admin/login");
     }
   }, [router]);
@@ -72,6 +109,7 @@ export default function AdminDashboard() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+          queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
           toast({ title: "Presente removido com sucesso." });
         }
       });
@@ -84,6 +122,7 @@ export default function AdminDashboard() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+          queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
           toast({ title: "Reserva cancelada com sucesso." });
         }
       });
@@ -120,19 +159,19 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats */}
-        {summary && (
+        {adminSummary && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-6 bg-card border border-border/50 flex flex-col justify-center">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Total</p>
-              <p className="text-3xl font-serif">{summary.total}</p>
+              <p className="text-3xl font-serif">{adminSummary.total}</p>
             </div>
             <div className="p-6 bg-card border border-border/50 border-t-2 border-t-primary/50 flex flex-col justify-center">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Reservados</p>
-              <p className="text-3xl font-serif text-primary">{summary.reserved}</p>
+              <p className="text-3xl font-serif text-primary">{adminSummary.reserved}</p>
             </div>
             <div className="p-6 bg-card border border-border/50 flex flex-col justify-center">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Disponíveis</p>
-              <p className="text-3xl font-serif">{summary.available}</p>
+              <p className="text-3xl font-serif">{adminSummary.available}</p>
             </div>
           </div>
         )}
@@ -185,6 +224,11 @@ export default function AdminDashboard() {
                             Disponível
                           </Badge>
                         )}
+                        {gift.isActive === false && (
+                          <Badge variant="outline" className="ml-2 bg-slate-500/10 text-slate-500 border-slate-500/20">
+                            Oculto
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         {gift.isReserved ? (
@@ -234,6 +278,24 @@ export default function AdminDashboard() {
                         <Button 
                           variant="ghost" 
                           size="icon" 
+                          onClick={() => setTestGift(gift)}
+                          title="Testar Pagamento"
+                          className="hover:bg-muted text-blue-500 hover:text-blue-600"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => toggleVisibility(gift)}
+                          title={gift.isActive !== false ? "Ocultar da Vitrine" : "Exibir na Vitrine"}
+                          className="hover:bg-muted"
+                        >
+                          {gift.isActive !== false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
                           onClick={() => handleDelete(gift.id)}
                           title="Excluir"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -253,9 +315,17 @@ export default function AdminDashboard() {
       <AdminGiftForm 
         isOpen={formOpen} 
         onClose={() => setFormOpen(false)} 
-        gift={editingGift} 
+        gift={editingGift}
         isDuplicate={isDuplicate}
       />
+      {testGift && (
+        <ReservationModal
+          isOpen={!!testGift}
+          onClose={() => setTestGift(null)}
+          gift={testGift}
+          isTestMode={true}
+        />
+      )}
     </div>
   );
 }
