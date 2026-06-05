@@ -17,9 +17,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -35,10 +37,27 @@ const formSchema = z.object({
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
-  pixLink: z.string().min(1, "Link do PIX é obrigatório"),
+  pixChargeType: z.enum(["LINK", "PIX_KEY"]).default("LINK"),
+  pixLink: z.string().optional(),
+  pixKey: z.string().optional(),
   creditLink: z.string().optional(),
   productLink: z.string().optional(),
   category: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.pixChargeType === "LINK" && (!data.pixLink || data.pixLink.trim() === "")) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Link do PIX é obrigatório",
+      path: ["pixLink"],
+    });
+  }
+  if (data.pixChargeType === "PIX_KEY" && (!data.pixKey || data.pixKey.trim() === "")) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Chave PIX (Copia e Cola) é obrigatória",
+      path: ["pixKey"],
+    });
+  }
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -63,7 +82,9 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
       description: "",
       imageUrl: "",
       price: 0,
+      pixChargeType: "LINK",
       pixLink: "",
+      pixKey: "",
       creditLink: "",
       productLink: "",
       category: "",
@@ -78,7 +99,9 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
           description: gift.description || "",
           imageUrl: gift.imageUrl || "",
           price: gift.price,
-          pixLink: gift.pixLink,
+          pixChargeType: gift.pixChargeType || "LINK",
+          pixLink: gift.pixLink || "",
+          pixKey: gift.pixKey || "",
           creditLink: gift.creditLink || "",
           productLink: gift.productLink || "",
           category: gift.category || "",
@@ -89,7 +112,9 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
           description: "",
           imageUrl: "",
           price: 0,
+          pixChargeType: "LINK",
           pixLink: "",
+          pixKey: "",
           creditLink: "",
           productLink: "",
           category: "",
@@ -140,6 +165,7 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
   };
 
   const isPending = createGift.isPending || updateGift.isPending;
+  const watchPixChargeType = form.watch("pixChargeType");
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -244,17 +270,68 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
 
               <FormField
                 control={form.control}
-                name="pixLink"
+                name="pixChargeType"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link do PIX (Obrigatório)</FormLabel>
+                  <FormItem className="space-y-3">
+                    <FormLabel>Método de Pagamento PIX</FormLabel>
                     <FormControl>
-                      <Input {...field} className="bg-background/50 border-border" placeholder="Link do Nubank, Mercado Pago, etc." />
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="LINK" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer">
+                            Link Externo (Ex: Mercado Pago, Nubank)
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="PIX_KEY" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer">
+                            Chave PIX ou PIX Copia e Cola (Gera QR Code na hora)
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {watchPixChargeType === "LINK" ? (
+                <FormField
+                  control={form.control}
+                  name="pixLink"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Link do PIX (Obrigatório)</FormLabel>
+                      <FormControl>
+                        <Input {...field} className="bg-background/50 border-border" placeholder="Link do Nubank, Mercado Pago, etc." />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="pixKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>PIX Copia e Cola (Obrigatório)</FormLabel>
+                      <FormControl>
+                        <Input {...field} className="bg-background/50 border-border" placeholder="Cole aqui o código PIX Copia e Cola com o valor exato" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
