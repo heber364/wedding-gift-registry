@@ -6,7 +6,7 @@ import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Wedding Gift Registry",
+  title: "Lista de Presentes | H&H",
   description: "Lista de presentes para casamento",
 };
 
