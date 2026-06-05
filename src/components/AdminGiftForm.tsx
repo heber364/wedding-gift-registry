@@ -6,6 +6,7 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -66,9 +67,10 @@ interface AdminGiftFormProps {
   isOpen: boolean;
   onClose: () => void;
   gift: Gift | null;
+  isDuplicate?: boolean;
 }
 
-export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
+export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -124,7 +126,7 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
   }, [isOpen, gift, form]);
 
   const onSubmit = (values: FormValues) => {
-    const isEditing = !!gift;
+    const isEditing = !!gift && !isDuplicate;
 
     const payload = {
       ...values,
@@ -155,10 +157,16 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
             queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
-            toast({ title: "Presente criado com sucesso." });
+            toast({ title: isDuplicate ? "Presente duplicado com sucesso." : "Presente criado com sucesso." });
             onClose();
           },
-          onError: () => toast({ variant: "destructive", title: "Erro ao criar presente." }),
+          onError: () => {
+            toast({
+              variant: "destructive",
+              title: "Erro ao salvar",
+              description: "Verifique os dados e tente novamente.",
+            });
+          },
         }
       );
     }
@@ -166,14 +174,22 @@ export function AdminGiftForm({ isOpen, onClose, gift }: AdminGiftFormProps) {
 
   const isPending = createGift.isPending || updateGift.isPending;
   const watchPixChargeType = form.watch("pixChargeType");
+  const isEditing = !!gift && !isDuplicate;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-card border-border/50">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">
-            {gift ? "Editar Presente" : "Novo Presente"}
+          <DialogTitle className="font-serif text-2xl font-normal">
+            {isEditing ? "Editar Presente" : isDuplicate ? "Duplicar Presente" : "Novo Presente"}
           </DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? "Modifique os detalhes do presente abaixo."
+              : isDuplicate
+                ? "Crie um novo presente a partir desta cópia."
+                : "Preencha os dados para adicionar um novo presente à lista."}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
