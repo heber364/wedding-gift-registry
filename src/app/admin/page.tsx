@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
 import type { Gift } from "@/lib/api-client-react";
-import { Plus, Trash2, Edit2, Unlock, LogOut } from "lucide-react";
+import { Plus, Trash2, Edit2, Unlock, LogOut, Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
@@ -39,6 +39,7 @@ export default function AdminDashboard() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingGift, setEditingGift] = useState<Gift | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false);
 
   useEffect(() => {
     // Check if authenticated
@@ -55,6 +56,13 @@ export default function AdminDashboard() {
 
   const handleEdit = (gift: Gift) => {
     setEditingGift(gift);
+    setIsDuplicate(false);
+    setFormOpen(true);
+  };
+
+  const handleDuplicate = (gift: Gift) => {
+    setEditingGift(gift);
+    setIsDuplicate(true);
     setFormOpen(true);
   };
 
@@ -102,7 +110,7 @@ export default function AdminDashboard() {
               Sair
             </Button>
             <Button 
-              onClick={() => { setEditingGift(null); setFormOpen(true); }}
+              onClick={() => { setEditingGift(null); setIsDuplicate(false); setFormOpen(true); }}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-serif"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -217,6 +225,15 @@ export default function AdminDashboard() {
                         <Button 
                           variant="ghost" 
                           size="icon" 
+                          onClick={() => handleDuplicate(gift)}
+                          title="Duplicar"
+                          className="hover:bg-muted"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
                           onClick={() => handleDelete(gift.id)}
                           title="Excluir"
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
@@ -237,6 +254,7 @@ export default function AdminDashboard() {
         isOpen={formOpen} 
         onClose={() => setFormOpen(false)} 
         gift={editingGift} 
+        isDuplicate={isDuplicate}
       />
     </div>
   );
