@@ -14,8 +14,9 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import type { Gift } from "@/lib/api-client-react";
 import { formatCurrency } from "@/lib/formatters";
-import { CreditCard, QrCode, CheckCircle2, Unlock } from "lucide-react";
+import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft } from "lucide-react";
 import { saveGuestIdentity, loadGuestIdentity } from "@/lib/guest-identity";
+import QRCode from "react-qr-code";
 
 interface ReservationModalProps {
   gift: Gift | null;
@@ -28,6 +29,7 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
   const [phone, setPhone] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isUnreserving, setIsUnreserving] = useState(false);
+  const [showPixQrCode, setShowPixQrCode] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
@@ -43,6 +45,7 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
     if (isOpen) {
       setIsSuccess(false);
       setIsUnreserving(false);
+      setShowPixQrCode(false);
       const saved = loadGuestIdentity();
       if (saved) {
         setName(saved.name);
@@ -111,13 +114,49 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
     );
   };
 
+  const handleCopyPix = () => {
+    if (gift.pixKey) {
+      navigator.clipboard.writeText(gift.pixKey);
+      toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[440px] bg-card border-border/50 shadow-2xl">
 
         {/* Case 1: Gift is reserved by this guest — offer to unreserve */}
         {isOwnReservation && !isSuccess ? (
-          <>
+          showPixQrCode ? (
+            /* Case 1b: Show Pix QR Code inside Own Reservation */
+            <div className="py-6 flex flex-col items-center text-center space-y-6">
+              <DialogHeader>
+                <DialogTitle className="font-serif text-2xl text-foreground">Pagamento via PIX</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Escaneie o QR Code abaixo ou copie a chave para pagar no app do seu banco.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
+                <QRCode value={gift.pixKey || ""} size={200} />
+              </div>
+
+              <div className="w-full space-y-2">
+                <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
+                <div className="flex items-center gap-2">
+                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+              </Button>
+            </div>
+          ) : (
+            <>
             <DialogHeader>
               <DialogTitle className="font-serif text-2xl text-foreground">Sua Reserva</DialogTitle>
               <DialogDescription className="text-muted-foreground">
@@ -139,14 +178,22 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
               </p>
 
               <div className="flex flex-col gap-3 pt-2">
-                {gift.pixLink && (
+                {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
+                  <Button
+                    onClick={() => setShowPixQrCode(true)}
+                    className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
+                  >
+                    <QrCode className="w-4 h-4 mr-2" />
+                    Pagar via PIX
+                  </Button>
+                ) : gift.pixLink ? (
                   <Button asChild className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground">
                     <a href={gift.pixLink} target="_blank" rel="noreferrer">
                       <QrCode className="w-4 h-4 mr-2" />
                       Pagar via PIX
                     </a>
                   </Button>
-                )}
+                ) : null}
                 {gift.creditLink && (
                   <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
                     <a href={gift.creditLink} target="_blank" rel="noreferrer">
@@ -169,7 +216,8 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
                 </Button>
               </div>
             </div>
-          </>
+            </>
+          )
         ) : !gift.isReserved && !isSuccess ? (
           /* Case 2: Gift is available — reservation form */
           <>
@@ -238,8 +286,37 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
             </form>
           </>
         ) : isSuccess ? (
-          /* Case 3: Just reserved — success screen with payment links */
-          <div className="py-6 flex flex-col items-center text-center space-y-6">
+          showPixQrCode ? (
+            /* Case 3b: Success Screen showing QR Code */
+            <div className="py-6 flex flex-col items-center text-center space-y-6">
+              <DialogHeader>
+                <DialogTitle className="font-serif text-2xl text-foreground">Pagamento via PIX</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Escaneie o QR Code abaixo ou copie a chave para pagar no app do seu banco.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
+                <QRCode value={gift.pixKey || ""} size={200} />
+              </div>
+
+              <div className="w-full space-y-2">
+                <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
+                <div className="flex items-center gap-2">
+                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+              </Button>
+            </div>
+          ) : (
+            /* Case 3: Just reserved — success screen with payment links */
+            <div className="py-6 flex flex-col items-center text-center space-y-6">
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
               <CheckCircle2 className="w-8 h-8 text-primary" />
             </div>
@@ -252,14 +329,22 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
             </div>
 
             <div className="w-full flex flex-col gap-3 pt-4">
-              {gift.pixLink && (
+              {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
+                <Button
+                  onClick={() => setShowPixQrCode(true)}
+                  className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
+                >
+                  <QrCode className="w-5 h-5 mr-2" />
+                  Pagar via PIX
+                </Button>
+              ) : gift.pixLink ? (
                 <Button asChild className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors">
                   <a href={gift.pixLink} target="_blank" rel="noreferrer">
                     <QrCode className="w-5 h-5 mr-2" />
                     Pagar via PIX
                   </a>
                 </Button>
-              )}
+              ) : null}
               {gift.creditLink && (
                 <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
                   <a href={gift.creditLink} target="_blank" rel="noreferrer">
@@ -274,6 +359,7 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
               Fechar
             </Button>
           </div>
+          )
         ) : (
           /* Case 4: Reserved by someone else */
           <div className="py-6 flex flex-col items-center text-center space-y-4">
