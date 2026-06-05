@@ -44,6 +44,7 @@ export interface Gift {
   reservedByPhone?: string | null;
   /** @nullable */
   reservedAt?: string | null;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -61,6 +62,7 @@ export interface GiftInput {
   /** Direct link to buy the product on a store website */
   productLink?: string;
   category?: string;
+  isActive?: boolean;
 }
 
 export interface GiftUpdate {
@@ -77,6 +79,7 @@ export interface GiftUpdate {
   /** Direct link to buy the product on a store website */
   productLink?: string;
   category?: string;
+  isActive?: boolean;
 }
 
 export interface ReservationInput {

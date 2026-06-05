@@ -218,7 +218,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-24 text-muted-foreground border border-dashed border-border/50">
-            <p className="font-serif text-2xl">Nenhum presente nesta categoria.</p>
+            <p className="font-serif text-2xl">Nenhum presente cadastrado.</p>
           </div>
         )}
       </main>

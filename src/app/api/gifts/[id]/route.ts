@@ -21,6 +21,7 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     reservedBy: g.reservedBy ?? null,
     reservedByPhone: g.reservedByPhone ?? null,
     reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
+    isActive: g.isActive,
     createdAt: g.createdAt.toISOString(),
   };
 }
@@ -61,6 +62,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (parsed.data.creditLink !== undefined) updates.creditLink = parsed.data.creditLink;
     if (parsed.data.productLink !== undefined) updates.productLink = parsed.data.productLink;
     if (parsed.data.category !== undefined) updates.category = parsed.data.category;
+    if (parsed.data.isActive !== undefined) updates.isActive = parsed.data.isActive;
 
     const [gift] = await db
       .update(giftsTable)

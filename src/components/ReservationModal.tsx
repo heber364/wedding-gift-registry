@@ -22,9 +22,10 @@ interface ReservationModalProps {
   gift: Gift | null;
   isOpen: boolean;
   onClose: () => void;
+  isTestMode?: boolean;
 }
 
-export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProps) {
+export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: ReservationModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -67,6 +68,11 @@ export function ReservationModal({ gift, isOpen, onClose }: ReservationModalProp
         title: "Preencha todos os campos",
         description: "Nome e telefone são obrigatórios.",
       });
+      return;
+    }
+
+    if (isTestMode) {
+      setIsSuccess(true);
       return;
     }
 

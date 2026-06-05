@@ -18,6 +18,7 @@ export const giftsTable = pgTable("gifts", {
   reservedBy: text("reserved_by"),
   reservedByPhone: text("reserved_by_phone"),
   reservedAt: timestamp("reserved_at"),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -27,6 +28,7 @@ export const insertGiftSchema = createInsertSchema(giftsTable).omit({
   reservedBy: true,
   reservedByPhone: true,
   reservedAt: true,
+  isActive: true,
   createdAt: true,
 });
 

@@ -37,6 +37,7 @@ export const ListGiftsResponseItem = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 export const ListGiftsResponse = zod.array(ListGiftsResponseItem)
@@ -61,7 +62,8 @@ export const CreateGiftBody = zod.object({
   "pixKey": zod.string().optional(),
   "creditLink": zod.string().optional(),
   "productLink": zod.string().optional().describe('Direct link to buy the product on a store website'),
-  "category": zod.string().optional()
+  "category": zod.string().optional(),
+  "isActive": zod.boolean().optional()
 })
 
 
@@ -88,6 +90,7 @@ export const GetGiftResponse = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 
@@ -114,7 +117,8 @@ export const UpdateGiftBody = zod.object({
   "pixKey": zod.string().optional(),
   "creditLink": zod.string().optional(),
   "productLink": zod.string().optional().describe('Direct link to buy the product on a store website'),
-  "category": zod.string().optional()
+  "category": zod.string().optional(),
+  "isActive": zod.boolean().optional()
 })
 
 export const UpdateGiftResponse = zod.object({
@@ -133,6 +137,7 @@ export const UpdateGiftResponse = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 
@@ -178,6 +183,7 @@ export const ReserveGiftResponse = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 
@@ -205,6 +211,7 @@ export const UnreserveGiftResponse = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 
@@ -240,6 +247,7 @@ export const UnreserveGiftByGuestResponse = zod.object({
   "reservedBy": zod.string().nullish().describe('Guest name who reserved'),
   "reservedByPhone": zod.string().nullish().describe('Guest phone who reserved'),
   "reservedAt": zod.string().nullish(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string()
 })
 
