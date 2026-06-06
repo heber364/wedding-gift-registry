@@ -81,6 +81,62 @@ const triggerConfetti = () => {
   frame();
 };
 
+const playSadSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    const playTone = (freq: number, startTime: number, duration: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+
+      osc.start(ctx.currentTime + startTime);
+      osc.stop(ctx.currentTime + startTime + duration);
+    };
+
+    // Acorde triste (descendente)
+    playTone(329.63, 0, 0.5);    // E4
+    playTone(311.13, 0.4, 0.5);  // Eb4
+    playTone(293.66, 0.8, 0.5);  // D4
+    playTone(277.18, 1.2, 1.0);  // Db4
+  } catch (e) {
+  }
+};
+
+const RainOverlay = () => {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[100000] bg-slate-900/50 flex overflow-hidden animate-in fade-in duration-500">
+      {Array.from({ length: 100 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute bg-blue-300/60 w-[2px] rounded-full"
+          style={{
+            height: `${Math.random() * 30 + 10}px`,
+            left: `${Math.random() * 100}%`,
+            top: `-50px`,
+            animation: `rain-fall ${Math.random() * 0.4 + 0.4}s linear infinite`,
+            animationDelay: `${Math.random() * 1}s`
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes rain-fall {
+          to { transform: translateY(110vh); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 interface ReservationModalProps {
   gift: Gift | null;
   isOpen: boolean;
@@ -96,6 +152,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [showPixQrCode, setShowPixQrCode] = useState(false);
   const [escapeCount, setEscapeCount] = useState(0);
   const [cancelButtonTransform, setCancelButtonTransform] = useState("");
+  const [showRain, setShowRain] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
@@ -114,6 +171,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       setShowPixQrCode(false);
       setEscapeCount(0);
       setCancelButtonTransform("");
+      setShowRain(false);
       const saved = loadGuestIdentity();
       if (saved) {
         setName(saved.name);
@@ -174,8 +232,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
-          toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
-          onClose();
+          playSadSound();
+          setShowRain(true);
+          setTimeout(() => {
+            setShowRain(false);
+            toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
+            onClose();
+          }, 2500);
         },
         onError: () => {
           setIsUnreserving(false);
@@ -494,6 +557,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           </div>
         )}
       </DialogContent>
+      {showRain && <RainOverlay />}
     </Dialog>
   );
 }
