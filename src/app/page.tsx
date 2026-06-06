@@ -9,6 +9,7 @@ import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import type { Gift } from "@/lib/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -95,13 +96,15 @@ export default function Home() {
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
             Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
-          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4">
+          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4 mb-8">
             <span className="w-12 h-px bg-border" />
             <p className="tracking-widest uppercase text-sm">22 de Novembro de 2026</p>
             <span className="w-12 h-px bg-border" />
           </div>
 
-          <p className="max-w-xl mx-auto text-muted-foreground pt-6 leading-relaxed">
+          <CountdownTimer />
+
+          <p className="max-w-xl mx-auto text-muted-foreground pt-8 leading-relaxed">
             Nossa maior alegria é celebrar este momento com vocês.
             Caso queiram nos abençoar com um presente, preparamos esta lista com muito carinho.
           </p>
