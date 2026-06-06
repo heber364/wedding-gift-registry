@@ -146,7 +146,7 @@ export default function Home() {
         {/* Stats Summary */}
         {summary && (
           <div className="flex justify-center mb-12">
-            <Card className="inline-flex gap-8 md:gap-16 border-border/50 px-8 py-4 bg-card/30 backdrop-blur-sm rounded-none shadow-none">
+            <Card className="inline-flex gap-8 md:gap-16 border-border/50 px-8 py-4 bg-card/30 backdrop-blur-sm  shadow-none">
               <div className="text-center">
                 <p className="text-2xl font-serif text-foreground">{summary.available}</p>
                 <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">Disponíveis</p>
@@ -172,7 +172,7 @@ export default function Home() {
                       <TabsTrigger
                         key={cat}
                         value={cat}
-                        className="px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium border border-border/40 transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-glow-primary data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50 data-[state=inactive]:hover:text-foreground rounded-none shadow-none"
+                        className="px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium border border-border/40 transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-glow-primary data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50 data-[state=inactive]:hover:text-foreground  shadow-none"
                       >
                         {cat}
                       </TabsTrigger>
@@ -205,10 +205,10 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="flex flex-col gap-4">
-                <Skeleton className="w-full aspect-[4/3] rounded-none" />
-                <Skeleton className="h-6 w-1/3 rounded-none" />
-                <Skeleton className="h-4 w-full rounded-none" />
-                <Skeleton className="h-4 w-2/3 rounded-none" />
+                <Skeleton className="w-full aspect-[4/3] " />
+                <Skeleton className="h-6 w-1/3 " />
+                <Skeleton className="h-4 w-full " />
+                <Skeleton className="h-4 w-2/3 " />
               </div>
             ))}
           </div>

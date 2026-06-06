@@ -38,8 +38,8 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
         <div className="aspect-[4/3] w-full bg-muted/20 relative overflow-hidden flex items-center justify-center">
           {gift.imageUrl ? (
             <>
-              <div 
-                className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110" 
+              <div
+                className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
                 style={{ backgroundImage: `url(${gift.imageUrl})` }}
               />
               <img
@@ -57,7 +57,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
 
           {isReserved && !isOwnReservation && (
             <div className="absolute inset-0 z-20 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
-              <Badge variant="secondary" className="bg-background/90 border-border px-6 py-2 shadow-2xl font-serif text-lg tracking-widest text-muted-foreground uppercase rounded-none hover:bg-background/90">
+              <Badge variant="secondary" className="bg-background/90 border-border px-6 py-2 shadow-2xl font-serif text-lg tracking-widest text-muted-foreground uppercase  hover:bg-background/90">
                 Reservado
               </Badge>
             </div>
@@ -65,7 +65,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
 
           {isOwnReservation && (
             <div className="absolute inset-0 z-20 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
-              <Badge variant="default" className="bg-primary/80 border-primary px-5 py-2 shadow-2xl font-serif text-sm tracking-widest text-primary-foreground uppercase rounded-none hover:bg-primary/80">
+              <Badge variant="default" className="bg-primary/80 border-primary px-5 py-2 shadow-2xl font-serif text-sm tracking-widest text-primary-foreground uppercase  hover:bg-primary/80">
                 Seu Presente
               </Badge>
             </div>
