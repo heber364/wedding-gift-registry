@@ -32,14 +32,20 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
         onClick={onClick}
         className="flex flex-col flex-grow cursor-pointer"
       >
-        <div className="aspect-[4/3] w-full bg-muted/20 relative overflow-hidden">
+        <div className="aspect-[4/3] w-full bg-muted/20 relative overflow-hidden flex items-center justify-center">
           {gift.imageUrl ? (
-            <img
-              src={gift.imageUrl}
-              alt={gift.name}
-              className={`w-full h-full object-cover transition-transform duration-700 ${!isReserved && "group-hover:scale-105"}`}
-              loading="lazy"
-            />
+            <>
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110" 
+                style={{ backgroundImage: `url(${gift.imageUrl})` }}
+              />
+              <img
+                src={gift.imageUrl}
+                alt={gift.name}
+                className={`w-full h-full object-contain relative z-10 transition-transform duration-700 ${!isReserved && "group-hover:scale-105"}`}
+                loading="lazy"
+              />
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground font-serif italic bg-muted/10">
               Sem Imagem
@@ -47,7 +53,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
           )}
 
           {isReserved && !isOwnReservation && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
+            <div className="absolute inset-0 z-20 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
               <div className="bg-background/90 border border-border px-6 py-2 shadow-2xl">
                 <span className="font-serif text-lg tracking-widest text-muted-foreground uppercase">
                   Reservado
@@ -57,7 +63,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
           )}
 
           {isOwnReservation && (
-            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
+            <div className="absolute inset-0 z-20 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
               <div className="bg-primary/80 border border-primary px-5 py-2 shadow-2xl">
                 <span className="font-serif text-sm tracking-widest text-primary-foreground uppercase">
                   Seu Presente
