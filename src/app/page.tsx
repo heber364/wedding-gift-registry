@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
+import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import type { Gift } from "@/lib/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -42,7 +43,7 @@ export default function Home() {
   const filteredGifts = useMemo(() => {
     if (!gifts) return [];
     let result = gifts;
-    
+
     if (activeCategory !== "Todos") {
       result = result.filter((g) => g.category === activeCategory);
     }
@@ -58,6 +59,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <InteractiveEnvelope />
       {/* Hero Header */}
       <header className="relative py-24 md:py-32 flex flex-col items-center justify-center text-center px-4 border-b border-border/30 overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
