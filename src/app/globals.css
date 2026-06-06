@@ -137,6 +137,8 @@
   --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0.5), 0px 4px 6px -1px hsl(0 0% 0% / 0.5);
   --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.5), 0px 8px 10px -1px hsl(0 0% 0% / 0.5);
   --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.5);
+  --shadow-glow-primary: 0 0 30px hsl(var(--primary) / 0.15);
+  --shadow-glow-secondary: 0 0 15px hsl(var(--primary) / 0.1);
   
   --tracking-normal: 0em;
   --spacing: 0.25rem;

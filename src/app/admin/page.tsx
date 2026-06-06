@@ -161,15 +161,15 @@ export default function AdminDashboard() {
         {/* Stats */}
         {adminSummary && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-6 bg-card border border-border/50 flex flex-col justify-center">
+            <div className="p-6 bg-card border border-border/50 flex flex-col justify-center rounded-lg">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Total</p>
               <p className="text-3xl font-serif">{adminSummary.total}</p>
             </div>
-            <div className="p-6 bg-card border border-border/50 border-t-2 border-t-primary/50 flex flex-col justify-center">
+            <div className="p-6 bg-card border border-border/50 border-t-2 border-t-primary/50 flex flex-col justify-center rounded-lg">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Reservados</p>
               <p className="text-3xl font-serif text-primary">{adminSummary.reserved}</p>
             </div>
-            <div className="p-6 bg-card border border-border/50 flex flex-col justify-center">
+            <div className="p-6 bg-card border border-border/50 flex flex-col justify-center rounded-lg">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Disponíveis</p>
               <p className="text-3xl font-serif">{adminSummary.available}</p>
             </div>
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-border/50 overflow-hidden">
+        <div className="bg-card border border-border/50 overflow-hidden rounded-lg">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/20">

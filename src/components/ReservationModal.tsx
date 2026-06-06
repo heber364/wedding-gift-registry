@@ -337,7 +337,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               {gift.imageUrl && (
-                <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center">
+                <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
                   <div
                     className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
                     style={{ backgroundImage: `url(${gift.imageUrl})` }}
@@ -414,7 +414,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
             </DialogHeader>
 
             {gift.imageUrl && (
-              <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center">
+              <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
                 <div
                   className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
                   style={{ backgroundImage: `url(${gift.imageUrl})` }}

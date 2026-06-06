@@ -11,7 +11,8 @@
     "db:down": "docker compose down",
     "db:restart": "docker compose down && docker compose up -d",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx --env-file=.env scripts/seed-gifts.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
