@@ -354,13 +354,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                       className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
                     >
                       <QrCode className="w-4 h-4 mr-2" />
-                      Pagar via PIX
+                      Presentear com PIX
                     </Button>
                   ) : gift.pixLink ? (
                     <Button asChild className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground">
                       <a href={gift.pixLink} target="_blank" rel="noreferrer">
                         <QrCode className="w-4 h-4 mr-2" />
-                        Pagar via PIX
+                        Presentear com PIX
                       </a>
                     </Button>
                   ) : null}
@@ -368,7 +368,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
                       <a href={gift.creditLink} target="_blank" rel="noreferrer">
                         <CreditCard className="w-4 h-4 mr-2" />
-                        Pagar no Crédito
+                        Presentear com Cartão de Crédito
                       </a>
                     </Button>
                   )}
@@ -514,13 +514,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
                   >
                     <QrCode className="w-5 h-5 mr-2" />
-                    Pagar via PIX
+                    Presentear com PIX
                   </Button>
                 ) : gift.pixLink ? (
                   <Button asChild className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors">
                     <a href={gift.pixLink} target="_blank" rel="noreferrer">
                       <QrCode className="w-5 h-5 mr-2" />
-                      Pagar via PIX
+                      Presentear com PIX
                     </a>
                   </Button>
                 ) : null}
@@ -528,7 +528,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                   <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
                     <a href={gift.creditLink} target="_blank" rel="noreferrer">
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Pagar no Crédito
+                      Presentear com Cartão
                     </a>
                   </Button>
                 )}
