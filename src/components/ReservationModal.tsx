@@ -263,7 +263,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
     if (escapeCount === 0) {
       e.preventDefault();
       // Vai para o topo, fora do modal
-      setCancelButtonTransform(`translate(0px, -600px)`);
+      setCancelButtonTransform(`translate(-500px, -500px)`);
       setEscapeCount(1);
     } else if (escapeCount === 1) {
       e.preventDefault();
@@ -337,8 +337,12 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               {gift.imageUrl && (
-                <div className="w-full h-36 overflow-hidden border border-border/50 mt-2">
-                  <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-cover" />
+                <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                    style={{ backgroundImage: `url(${gift.imageUrl})` }}
+                  />
+                  <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
                 </div>
               )}
 
@@ -410,8 +414,12 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
             </DialogHeader>
 
             {gift.imageUrl && (
-              <div className="w-full h-36 overflow-hidden border border-border/50 mt-2">
-                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-cover" />
+              <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center">
+                <div
+                  className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                  style={{ backgroundImage: `url(${gift.imageUrl})` }}
+                />
+                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
               </div>
             )}
 
