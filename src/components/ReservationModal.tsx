@@ -260,16 +260,31 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   };
 
   const handleCancelClick = (e: React.MouseEvent) => {
-    if (escapeCount === 0) {
+    if (escapeCount === 0 || escapeCount === 1) {
       e.preventDefault();
-      // Vai para o topo, fora do modal
-      setCancelButtonTransform(`translate(-500px, -500px)`);
-      setEscapeCount(1);
-    } else if (escapeCount === 1) {
-      e.preventDefault();
-      // Vai para a direita, fora do modal
-      setCancelButtonTransform(`translate(500px, 0px)`);
-      setEscapeCount(2);
+      
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+      
+      // Assumindo que o botão tem cerca de 350px de largura e o modal está centralizado
+      const availableSpaceX = (viewportWidth - 350) / 2;
+      const availableSpaceTop = viewportHeight / 2;
+      
+      let moveX = 0;
+      let moveY = 0;
+
+      if (escapeCount === 0) {
+        // Foge para cima e esquerda, respeitando os limites da tela
+        moveX = availableSpaceX > 20 ? -Math.min(500, availableSpaceX - 20) : 0;
+        moveY = -Math.min(500, availableSpaceTop - 50);
+      } else {
+        // Foge para direita (no mobile, move levemente para baixo)
+        moveX = availableSpaceX > 20 ? Math.min(500, availableSpaceX - 20) : 0;
+        moveY = moveX === 0 ? Math.min(100, viewportHeight * 0.1) : 0;
+      }
+
+      setCancelButtonTransform(`translate(${moveX}px, ${moveY}px)`);
+      setEscapeCount(escapeCount + 1);
     } else if (escapeCount === 2) {
       e.preventDefault();
       // Retorna para a posição original para permitir o clique
