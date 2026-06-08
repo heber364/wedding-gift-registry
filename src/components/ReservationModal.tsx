@@ -296,7 +296,8 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       });
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url;
+        window.open(data.url, '_blank', 'noopener,noreferrer');
+        setIsGeneratingCheckout(false);
       } else {
         toast({
           variant: "destructive",
