@@ -20,13 +20,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Integração do Mercado Pago não configurada." }, { status: 500 });
     }
 
-    let absoluteImageUrl = "";
-    if (gift.imageUrl) {
-      const baseUrl = new URL(currentUrl).origin;
-      absoluteImageUrl = gift.imageUrl.startsWith("http")
-        ? gift.imageUrl
-        : `${baseUrl}${gift.imageUrl.startsWith("/") ? "" : "/"}${gift.imageUrl}`;
-    }
+
 
     const preferenceData: any = {
       items: [
@@ -34,7 +28,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           id: gift.id.toString(),
           title: `Presente: ${gift.name}`,
           description: gift.description || `Presente de casamento: ${gift.name}`,
-          picture_url: absoluteImageUrl,
           quantity: 1,
           currency_id: "BRL",
           unit_price: parseFloat(gift.price as unknown as string),
@@ -51,6 +44,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (currentUrl.startsWith("https://")) {
       preferenceData.auto_return = "approved";
     }
+
 
     const mpRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
