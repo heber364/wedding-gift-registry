@@ -14,11 +14,8 @@ export interface Gift {
   /** @nullable */
   imageUrl?: string | null;
   price: number;
-  pixChargeType?: "LINK" | "PIX_KEY";
   /** @nullable */
-  pixLink?: string | null;
   /** @nullable */
-  pixKey?: string | null;
   /** @nullable */
   creditLink?: string | null;
   /**

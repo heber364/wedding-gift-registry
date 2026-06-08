@@ -18,6 +18,7 @@ import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft, ShoppingCart
 import { saveGuestIdentity, loadGuestIdentity } from "@/lib/guest-identity";
 import QRCode from "react-qr-code";
 import confetti from "canvas-confetti";
+import { QrCodePix } from "qrcode-pix";
 
 const playCelebrationSound = () => {
   try {
@@ -153,6 +154,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [escapeCount, setEscapeCount] = useState(0);
   const [cancelButtonTransform, setCancelButtonTransform] = useState("");
   const [showRain, setShowRain] = useState(false);
+  const [pixPayload, setPixPayload] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
@@ -182,6 +184,27 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       }
     }
   }, [isOpen, gift?.id]);
+
+  useEffect(() => {
+    if (showPixQrCode && gift) {
+      const pixKey = process.env.NEXT_PUBLIC_PIX_KEY || "+5573998426857";
+      const pixName = process.env.NEXT_PUBLIC_PIX_NAME || "Heber Lima Silva";
+      const pixCity = process.env.NEXT_PUBLIC_PIX_CITY || "Sao Paulo";
+
+      const formattedName = gift.name.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().substring(0, 25);
+
+      const qrCodePix = QrCodePix({
+        version: "01",
+        key: pixKey,
+        name: pixName,
+        city: pixCity,
+        transactionId: formattedName || `GIFT${gift.id}`,
+        message: `Presente ${gift.name}`,
+        value: gift.price,
+      });
+      setPixPayload(qrCodePix.payload());
+    }
+  }, [showPixQrCode, gift]);
 
   if (!gift) return null;
 
@@ -253,8 +276,8 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   };
 
   const handleCopyPix = () => {
-    if (gift.pixKey) {
-      navigator.clipboard.writeText(gift.pixKey);
+    if (pixPayload) {
+      navigator.clipboard.writeText(pixPayload);
       toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
     }
   };
@@ -323,13 +346,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={gift.pixKey || ""} size={200} />
+                <QRCode value={pixPayload} size={200} />
               </div>
 
               <div className="w-full space-y-2">
                 <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
                   <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -367,22 +390,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                 </p>
 
                 <div className="flex flex-col gap-3 pt-2">
-                  {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
-                    <Button
-                      onClick={() => setShowPixQrCode(true)}
-                      className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
-                    >
-                      <QrCode className="w-4 h-4 mr-2" />
-                      Presentear com PIX
-                    </Button>
-                  ) : gift.pixLink ? (
-                    <Button asChild className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground">
-                      <a href={gift.pixLink} target="_blank" rel="noreferrer">
-                        <QrCode className="w-4 h-4 mr-2" />
-                        Presentear com PIX
-                      </a>
-                    </Button>
-                  ) : null}
+                  <Button
+                    onClick={() => setShowPixQrCode(true)}
+                    className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
+                  >
+                    <QrCode className="w-4 h-4 mr-2" />
+                    Presentear com PIX
+                  </Button>
                   {gift.creditLink && (
                     <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
                       <a href={gift.creditLink} target="_blank" rel="noreferrer">
@@ -499,13 +513,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={gift.pixKey || ""} size={200} />
+                <QRCode value={pixPayload} size={200} />
               </div>
 
               <div className="w-full space-y-2">
                 <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
                   <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -531,22 +545,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </div>
 
               <div className="w-full flex flex-col gap-3 pt-4">
-                {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
-                  <Button
-                    onClick={() => setShowPixQrCode(true)}
-                    className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
-                  >
-                    <QrCode className="w-5 h-5 mr-2" />
-                    Presentear com PIX
-                  </Button>
-                ) : gift.pixLink ? (
-                  <Button asChild className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors">
-                    <a href={gift.pixLink} target="_blank" rel="noreferrer">
-                      <QrCode className="w-5 h-5 mr-2" />
-                      Presentear com PIX
-                    </a>
-                  </Button>
-                ) : null}
+                <Button
+                  onClick={() => setShowPixQrCode(true)}
+                  className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
+                >
+                  <QrCode className="w-5 h-5 mr-2" />
+                  Presentear com PIX
+                </Button>
                 {gift.creditLink && (
                   <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
                     <a href={gift.creditLink} target="_blank" rel="noreferrer">
