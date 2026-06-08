@@ -155,6 +155,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [cancelButtonTransform, setCancelButtonTransform] = useState("");
   const [showRain, setShowRain] = useState(false);
   const [pixPayload, setPixPayload] = useState("");
+  const [isGeneratingCheckout, setIsGeneratingCheckout] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
@@ -174,6 +175,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       setEscapeCount(0);
       setCancelButtonTransform("");
       setShowRain(false);
+      setIsGeneratingCheckout(false);
       const saved = loadGuestIdentity();
       if (saved) {
         setName(saved.name);
@@ -279,6 +281,38 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
     if (pixPayload) {
       navigator.clipboard.writeText(pixPayload);
       toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
+    }
+  };
+
+  const handleCreditCheckout = async () => {
+    try {
+      setIsGeneratingCheckout(true);
+      const res = await fetch(`/api/gifts/${gift.id}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentUrl: window.location.href,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.open(data.url, '_blank', 'noopener,noreferrer');
+        setIsGeneratingCheckout(false);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro ao gerar pagamento",
+          description: data.error || "Tente novamente mais tarde.",
+        });
+        setIsGeneratingCheckout(false);
+      }
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao gerar pagamento",
+        description: "Não foi possível conectar ao Mercado Pago.",
+      });
+      setIsGeneratingCheckout(false);
     }
   };
 
@@ -397,14 +431,15 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     <QrCode className="w-4 h-4 mr-2" />
                     Presentear com PIX
                   </Button>
-                  {gift.creditLink && (
-                    <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
-                      <a href={gift.creditLink} target="_blank" rel="noreferrer">
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Presentear com Cartão de Crédito
-                      </a>
-                    </Button>
-                  )}
+                  <Button 
+                    onClick={handleCreditCheckout} 
+                    disabled={isGeneratingCheckout}
+                    variant="outline" 
+                    className="w-full h-11 border-border text-foreground hover:bg-muted"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
+                  </Button>
                   {gift.productLink && (
                     <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
                       <a href={gift.productLink} target="_blank" rel="noreferrer">
@@ -552,14 +587,15 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                   <QrCode className="w-5 h-5 mr-2" />
                   Presentear com PIX
                 </Button>
-                {gift.creditLink && (
-                  <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
-                    <a href={gift.creditLink} target="_blank" rel="noreferrer">
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Presentear com Cartão
-                    </a>
-                  </Button>
-                )}
+                <Button 
+                  onClick={handleCreditCheckout} 
+                  disabled={isGeneratingCheckout}
+                  variant="outline" 
+                  className="w-full h-12 border-border text-foreground hover:bg-muted"
+                >
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão"}
+                </Button>
                 {gift.productLink && (
                   <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
                     <a href={gift.productLink} target="_blank" rel="noreferrer">

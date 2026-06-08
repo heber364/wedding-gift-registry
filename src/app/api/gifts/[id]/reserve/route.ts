@@ -11,7 +11,6 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     description: g.description ?? null,
     imageUrl: g.imageUrl ?? null,
     price: parseFloat(g.price as unknown as string),
-    creditLink: g.creditLink ?? null,
     productLink: g.productLink ?? null,
     category: g.category ?? null,
     isReserved: g.isReserved,

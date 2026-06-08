@@ -11,7 +11,6 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     description: g.description ?? null,
     imageUrl: g.imageUrl ?? null,
     price: parseFloat(g.price as unknown as string),
-    creditLink: g.creditLink ?? null,
     productLink: g.productLink ?? null,
     category: g.category ?? null,
     isReserved: g.isReserved,
@@ -53,7 +52,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (parsed.data.description !== undefined) updates.description = parsed.data.description;
     if (parsed.data.imageUrl !== undefined) updates.imageUrl = parsed.data.imageUrl;
     if (parsed.data.price !== undefined) updates.price = String(parsed.data.price);
-    if (parsed.data.creditLink !== undefined) updates.creditLink = parsed.data.creditLink;
     if (parsed.data.productLink !== undefined) updates.productLink = parsed.data.productLink;
     if (parsed.data.category !== undefined) updates.category = parsed.data.category;
     if (parsed.data.isActive !== undefined) updates.isActive = parsed.data.isActive;

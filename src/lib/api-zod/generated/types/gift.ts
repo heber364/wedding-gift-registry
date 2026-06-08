@@ -16,8 +16,6 @@ export interface Gift {
   price: number;
   /** @nullable */
   /** @nullable */
-  /** @nullable */
-  creditLink?: string | null;
   /**
      * Direct link to buy the product on a store website
      * @nullable

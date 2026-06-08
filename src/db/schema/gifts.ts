@@ -8,7 +8,6 @@ export const giftsTable = pgTable("gifts", {
   description: text("description"),
   imageUrl: text("image_url"),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  creditLink: text("credit_link"),
   productLink: text("product_link"),
   category: text("category"),
   isReserved: boolean("is_reserved").notNull().default(false),
