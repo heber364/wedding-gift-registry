@@ -38,7 +38,6 @@ const formSchema = z.object({
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
-  creditLink: z.string().optional(),
   productLink: z.string().optional(),
   category: z.string().optional(),
 });
@@ -66,7 +65,6 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
       description: "",
       imageUrl: "",
       price: 0,
-      creditLink: "",
       productLink: "",
       category: "",
     },
@@ -80,7 +78,6 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           description: gift.description || "",
           imageUrl: gift.imageUrl || "",
           price: gift.price,
-          creditLink: gift.creditLink || "",
           productLink: gift.productLink || "",
           category: gift.category || "",
         });
@@ -90,7 +87,6 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           description: "",
           imageUrl: "",
           price: 0,
-          creditLink: "",
           productLink: "",
           category: "",
         });
@@ -105,7 +101,6 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
       ...values,
       description: values.description || undefined,
       imageUrl: values.imageUrl || undefined,
-      creditLink: values.creditLink || undefined,
       productLink: values.productLink || undefined,
       category: values.category || undefined,
     };
@@ -253,23 +248,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
               )}
             />
 
-            <div className="space-y-4 border border-border/50 p-4 bg-muted/5 mt-4">
-              <h4 className="font-serif text-lg">Links de Pagamento</h4>
 
-              <FormField
-                control={form.control}
-                name="creditLink"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Link para Cartão de Crédito (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="bg-background/50 border-border" placeholder="Link Mercado Pago, PicPay, etc." />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-border hover:bg-muted">

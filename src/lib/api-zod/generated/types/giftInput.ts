@@ -15,7 +15,6 @@ export interface GiftInput {
   price: number;
   /** @minLength 1 */
   pixLink: string;
-  creditLink?: string;
   /** Direct link to buy the product on a store website */
   productLink?: string;
   category?: string;
