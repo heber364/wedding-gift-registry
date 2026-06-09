@@ -444,16 +444,18 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                       </p>
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    onClick={handleCancelClick}
-                    disabled={isUnreserving || unreserveByGuest.isPending}
-                    style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
-                    className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
-                  >
-                    <Unlock className="w-4 h-4 mr-2" />
-                    {getCancelButtonText()}
-                  </Button>
+                  {!gift.isPurchased && (
+                    <Button
+                      variant="ghost"
+                      onClick={handleCancelClick}
+                      disabled={isUnreserving || unreserveByGuest.isPending}
+                      style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
+                      className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
+                    >
+                      <Unlock className="w-4 h-4 mr-2" />
+                      {getCancelButtonText()}
+                    </Button>
+                  )}
                   <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
                     Fechar
                   </Button>

@@ -294,7 +294,7 @@ export default function AdminDashboard() {
                             <DropdownMenuItem onClick={() => toggleVisibility(gift)} className="cursor-pointer">
                               {gift.isActive !== false ? <><EyeOff className="w-4 h-4 mr-2" /> Ocultar</> : <><Eye className="w-4 h-4 mr-2" /> Exibir</>}
                             </DropdownMenuItem>
-                            {gift.isReserved && (
+                            {gift.isReserved && !gift.isPurchased && (
                               <DropdownMenuItem onClick={() => handleUnreserve(gift.id)} className="cursor-pointer text-orange-500 focus:text-orange-600 focus:bg-orange-500/10">
                                 <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
                               </DropdownMenuItem>

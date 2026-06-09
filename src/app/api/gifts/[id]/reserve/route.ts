@@ -17,6 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const [existing] = await db.select().from(giftsTable).where(eq(giftsTable.id, parsedParams.data.id));
     if (!existing) return NextResponse.json({ error: "Gift not found" }, { status: 404 });
     if (existing.isReserved) return NextResponse.json({ error: "Gift already reserved" }, { status: 400 });
+    if (existing.isPurchased) return NextResponse.json({ error: "Não é possível reservar um presente já comprado" }, { status: 400 });
 
     const [gift] = await db
       .update(giftsTable)
@@ -42,6 +43,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (!parsed.success) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
+    const [existing] = await db.select().from(giftsTable).where(eq(giftsTable.id, parsed.data.id));
+    if (!existing) return NextResponse.json({ error: "Gift not found" }, { status: 404 });
+    if (existing.isPurchased) return NextResponse.json({ error: "Não é possível cancelar a reserva de um presente já comprado" }, { status: 400 });
+
     const [gift] = await db
       .update(giftsTable)
       .set({
