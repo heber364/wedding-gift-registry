@@ -18,6 +18,7 @@ export const UpdateGiftBody = z.object({
   productLink: z.string().optional().describe("Link direto para comprar o produto no site da loja"),
   category: z.string().optional(),
   isActive: z.boolean().optional(),
+  isPurchased: z.boolean().optional(),
 });
 
 export const ReserveGiftBody = z.object({

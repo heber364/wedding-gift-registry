@@ -37,6 +37,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (parsed.data.productLink !== undefined) updates.productLink = parsed.data.productLink;
     if (parsed.data.category !== undefined) updates.category = parsed.data.category;
     if (parsed.data.isActive !== undefined) updates.isActive = parsed.data.isActive;
+    if (parsed.data.isPurchased !== undefined) updates.isPurchased = parsed.data.isPurchased;
 
     const [gift] = await db
       .update(giftsTable)
