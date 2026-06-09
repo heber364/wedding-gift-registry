@@ -22,6 +22,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 type SortOption = "default" | "price-asc" | "price-desc";
 
@@ -35,6 +37,8 @@ export default function Home() {
 
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
+  const [activeFilter, setActiveFilter] = useState<string>("Todos"); // Todos, Disponíveis, Reservados
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOption, setSortOption] = useState<SortOption>("default");
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -52,6 +56,20 @@ export default function Home() {
       result = result.filter((g) => g.category === activeCategory);
     }
 
+    if (activeFilter === "Disponíveis") {
+      result = result.filter((g) => !g.isReserved && !g.isPurchased);
+    } else if (activeFilter === "Reservados") {
+      result = result.filter((g) => g.isReserved || g.isPurchased);
+    }
+
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((g) => 
+        g.name.toLowerCase().includes(q) || 
+        (g.description && g.description.toLowerCase().includes(q))
+      );
+    }
+
     if (sortOption === "price-asc") {
       result = [...result].sort((a, b) => a.price - b.price);
     } else if (sortOption === "price-desc") {
@@ -59,7 +77,7 @@ export default function Home() {
     }
 
     return result;
-  }, [gifts, activeCategory, sortOption]);
+  }, [gifts, activeCategory, activeFilter, searchQuery, sortOption]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -185,11 +203,32 @@ export default function Home() {
               )}
             </div>
 
-            {/* Sort Dropdown */}
+            {/* Sort Dropdown & Filters */}
             {gifts && gifts.length > 0 && (
-              <div className="w-full sm:w-auto shrink-0 flex justify-end">
+              <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-center shrink-0">
+                <div className="relative w-full sm:w-[220px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar presente..." 
+                    className="pl-9 h-10 w-full border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors"
+                  />
+                </div>
+                
+                <Select value={activeFilter} onValueChange={setActiveFilter}>
+                  <SelectTrigger className="w-full sm:w-[160px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border/60">
+                    <SelectItem value="Todos" className="cursor-pointer">Todos os Status</SelectItem>
+                    <SelectItem value="Disponíveis" className="cursor-pointer">Disponíveis</SelectItem>
+                    <SelectItem value="Reservados" className="cursor-pointer">Reservados</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
-                  <SelectTrigger className="w-full sm:w-[220px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border/60">
