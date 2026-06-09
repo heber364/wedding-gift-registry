@@ -17,6 +17,126 @@ import { formatCurrency } from "@/lib/formatters";
 import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft, ShoppingCart } from "lucide-react";
 import { saveGuestIdentity, loadGuestIdentity } from "@/lib/guest-identity";
 import QRCode from "react-qr-code";
+import confetti from "canvas-confetti";
+import { QrCodePix } from "qrcode-pix";
+
+const playCelebrationSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    const playTone = (freq: number, startTime: number, duration: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+
+      osc.start(ctx.currentTime + startTime);
+      osc.stop(ctx.currentTime + startTime + duration);
+    };
+
+    // Acorde feliz (arpejo maior)
+    playTone(523.25, 0, 0.4);     // C5
+    playTone(659.25, 0.1, 0.4);   // E5
+    playTone(783.99, 0.2, 0.4);   // G5
+    playTone(1046.50, 0.3, 0.8);  // C6
+  } catch (e) {
+    // Ignora erros caso o navegador bloqueie autoplay de áudio sem interação
+  }
+};
+
+const triggerConfetti = () => {
+  playCelebrationSound();
+  const duration = 3000;
+  const end = Date.now() + duration;
+
+  const frame = () => {
+    confetti({
+      particleCount: 5,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+      colors: ['#9b2d42', '#ffffff', '#e3a1b3'],
+      zIndex: 9999
+    });
+    confetti({
+      particleCount: 5,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+      colors: ['#9b2d42', '#ffffff', '#e3a1b3'],
+      zIndex: 9999
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  };
+  frame();
+};
+
+const playSadSound = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+
+    const playTone = (freq: number, startTime: number, duration: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + startTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+
+      osc.start(ctx.currentTime + startTime);
+      osc.stop(ctx.currentTime + startTime + duration);
+    };
+
+    // Acorde triste (descendente)
+    playTone(329.63, 0, 0.5);    // E4
+    playTone(311.13, 0.4, 0.5);  // Eb4
+    playTone(293.66, 0.8, 0.5);  // D4
+    playTone(277.18, 1.2, 1.0);  // Db4
+  } catch (e) {
+  }
+};
+
+const RainOverlay = () => {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[100000] bg-slate-900/50 flex overflow-hidden animate-in fade-in duration-500">
+      {Array.from({ length: 100 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute bg-blue-300/60 w-[2px] rounded-full"
+          style={{
+            height: `${Math.random() * 30 + 10}px`,
+            left: `${Math.random() * 100}%`,
+            top: `-50px`,
+            animation: `rain-fall ${Math.random() * 0.4 + 0.4}s linear infinite`,
+            animationDelay: `${Math.random() * 1}s`
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes rain-fall {
+          to { transform: translateY(110vh); }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 interface ReservationModalProps {
   gift: Gift | null;
@@ -31,6 +151,11 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [isSuccess, setIsSuccess] = useState(false);
   const [isUnreserving, setIsUnreserving] = useState(false);
   const [showPixQrCode, setShowPixQrCode] = useState(false);
+  const [escapeCount, setEscapeCount] = useState(0);
+  const [cancelButtonTransform, setCancelButtonTransform] = useState("");
+  const [showRain, setShowRain] = useState(false);
+  const [pixPayload, setPixPayload] = useState("");
+  const [isGeneratingCheckout, setIsGeneratingCheckout] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
@@ -47,6 +172,10 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       setIsSuccess(false);
       setIsUnreserving(false);
       setShowPixQrCode(false);
+      setEscapeCount(0);
+      setCancelButtonTransform("");
+      setShowRain(false);
+      setIsGeneratingCheckout(false);
       const saved = loadGuestIdentity();
       if (saved) {
         setName(saved.name);
@@ -57,6 +186,27 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
       }
     }
   }, [isOpen, gift?.id]);
+
+  useEffect(() => {
+    if (showPixQrCode && gift) {
+      const pixKey = process.env.NEXT_PUBLIC_PIX_KEY || "+5573998426857";
+      const pixName = process.env.NEXT_PUBLIC_PIX_NAME || "Heber Lima Silva";
+      const pixCity = process.env.NEXT_PUBLIC_PIX_CITY || "Sao Paulo";
+
+      const formattedName = gift.name.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().substring(0, 25);
+
+      const qrCodePix = QrCodePix({
+        version: "01",
+        key: pixKey,
+        name: pixName,
+        city: pixCity,
+        transactionId: formattedName || `GIFT${gift.id}`,
+        message: `Presente ${gift.name}`,
+        value: gift.price,
+      });
+      setPixPayload(qrCodePix.payload());
+    }
+  }, [showPixQrCode, gift]);
 
   if (!gift) return null;
 
@@ -72,6 +222,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
     }
 
     if (isTestMode) {
+      triggerConfetti();
       setIsSuccess(true);
       return;
     }
@@ -83,6 +234,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           saveGuestIdentity({ name: name.trim(), phone: phone.trim() });
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+          triggerConfetti();
           setIsSuccess(true);
         },
         onError: () => {
@@ -105,8 +257,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
-          toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
-          onClose();
+          playSadSound();
+          setShowRain(true);
+          setTimeout(() => {
+            setShowRain(false);
+            toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
+            onClose();
+          }, 2500);
         },
         onError: () => {
           setIsUnreserving(false);
@@ -121,9 +278,88 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   };
 
   const handleCopyPix = () => {
-    if (gift.pixKey) {
-      navigator.clipboard.writeText(gift.pixKey);
+    if (pixPayload) {
+      navigator.clipboard.writeText(pixPayload);
       toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
+    }
+  };
+
+  const handleCreditCheckout = async () => {
+    try {
+      setIsGeneratingCheckout(true);
+      const res = await fetch(`/api/gifts/${gift.id}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentUrl: window.location.href,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.open(data.url, '_blank', 'noopener,noreferrer');
+        setIsGeneratingCheckout(false);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro ao gerar pagamento",
+          description: data.error || "Tente novamente mais tarde.",
+        });
+        setIsGeneratingCheckout(false);
+      }
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao gerar pagamento",
+        description: "Não foi possível conectar ao Mercado Pago.",
+      });
+      setIsGeneratingCheckout(false);
+    }
+  };
+
+  const handleCancelClick = (e: React.MouseEvent) => {
+    if (escapeCount === 0 || escapeCount === 1) {
+      e.preventDefault();
+      
+      const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000;
+      
+      // Assumindo que o botão tem cerca de 350px de largura e o modal está centralizado
+      const availableSpaceX = (viewportWidth - 350) / 2;
+      const availableSpaceTop = viewportHeight / 2;
+      
+      let moveX = 0;
+      let moveY = 0;
+
+      if (escapeCount === 0) {
+        // Foge para cima e esquerda, respeitando os limites da tela
+        moveX = availableSpaceX > 20 ? -Math.min(500, availableSpaceX - 20) : 0;
+        moveY = -Math.min(500, availableSpaceTop - 50);
+      } else {
+        // Foge para direita (no mobile, move levemente para baixo)
+        moveX = availableSpaceX > 20 ? Math.min(500, availableSpaceX - 20) : 0;
+        moveY = moveX === 0 ? Math.min(100, viewportHeight * 0.1) : 0;
+      }
+
+      setCancelButtonTransform(`translate(${moveX}px, ${moveY}px)`);
+      setEscapeCount(escapeCount + 1);
+    } else if (escapeCount === 2) {
+      e.preventDefault();
+      // Retorna para a posição original para permitir o clique
+      setCancelButtonTransform(`translate(0px, 0px)`);
+      setEscapeCount(3);
+    } else {
+      // 3ª tentativa (escapeCount === 3), executa a ação
+      handleGuestUnreserve();
+    }
+  };
+
+  const getCancelButtonText = () => {
+    if (unreserveByGuest.isPending) return "Cancelando...";
+    switch (escapeCount) {
+      case 0: return "Cancelar minha reserva";
+      case 1: return "Tem certeza? 😢";
+      case 2: return "Poxa vida... 😭";
+      default: return "Ok, pode cancelar...";
     }
   };
 
@@ -144,13 +380,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={gift.pixKey || ""} size={200} />
+                <QRCode value={pixPayload} size={200} />
               </div>
 
               <div className="w-full space-y-2">
                 <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
                   <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -163,73 +399,70 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
             </div>
           ) : (
             <>
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl text-foreground">Sua Reserva</DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Você reservou{" "}
-                <strong className="text-foreground font-medium">{gift.name}</strong> —{" "}
-                {formatCurrency(gift.price)}.
-              </DialogDescription>
-            </DialogHeader>
+              <DialogHeader>
+                <DialogTitle className="font-serif text-2xl text-foreground">Sua Reserva</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Você reservou{" "}
+                  <strong className="text-foreground font-medium">{gift.name}</strong> —{" "}
+                  {formatCurrency(gift.price)}.
+                </DialogDescription>
+              </DialogHeader>
 
-            {gift.imageUrl && (
-              <div className="w-full h-36 overflow-hidden border border-border/50 mt-2">
-                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-cover" />
-              </div>
-            )}
+              {gift.imageUrl && (
+                <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                    style={{ backgroundImage: `url(${gift.imageUrl})` }}
+                  />
+                  <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
+                </div>
+              )}
 
-            <div className="space-y-4 mt-4">
-              <p className="text-sm text-muted-foreground">
-                Reservado por <span className="text-foreground font-medium">{gift.reservedBy}</span>.
-              </p>
+              <div className="space-y-4 mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Reservado por <span className="text-foreground font-medium">{gift.reservedBy}</span>.
+                </p>
 
-              <div className="flex flex-col gap-3 pt-2">
-                {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
+                <div className="flex flex-col gap-3 pt-2">
                   <Button
                     onClick={() => setShowPixQrCode(true)}
                     className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
                   >
                     <QrCode className="w-4 h-4 mr-2" />
-                    Pagar via PIX
+                    Presentear com PIX
                   </Button>
-                ) : gift.pixLink ? (
-                  <Button asChild className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground">
-                    <a href={gift.pixLink} target="_blank" rel="noreferrer">
-                      <QrCode className="w-4 h-4 mr-2" />
-                      Pagar via PIX
-                    </a>
+                  <Button 
+                    onClick={handleCreditCheckout} 
+                    disabled={isGeneratingCheckout}
+                    variant="outline" 
+                    className="w-full h-11 border-border text-foreground hover:bg-muted"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
                   </Button>
-                ) : null}
-                {gift.creditLink && (
-                  <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
-                    <a href={gift.creditLink} target="_blank" rel="noreferrer">
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Pagar no Crédito
-                    </a>
+                  {gift.productLink && (
+                    <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
+                      <a href={gift.productLink} target="_blank" rel="noreferrer">
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Comprar diretamente no site
+                      </a>
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    onClick={handleCancelClick}
+                    disabled={isUnreserving || unreserveByGuest.isPending}
+                    style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
+                    className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
+                  >
+                    <Unlock className="w-4 h-4 mr-2" />
+                    {getCancelButtonText()}
                   </Button>
-                )}
-                {gift.productLink && (
-                  <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
-                    <a href={gift.productLink} target="_blank" rel="noreferrer">
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Comprar diretamente no site
-                    </a>
+                  <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+                    Fechar
                   </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  onClick={handleGuestUnreserve}
-                  disabled={isUnreserving || unreserveByGuest.isPending}
-                  className="w-full h-11 border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2"
-                >
-                  <Unlock className="w-4 h-4 mr-2" />
-                  {unreserveByGuest.isPending ? "Cancelando..." : "Cancelar minha reserva"}
-                </Button>
-                <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
-                  Fechar
-                </Button>
+                </div>
               </div>
-            </div>
             </>
           )
         ) : !gift.isReserved && !isSuccess ? (
@@ -245,8 +478,12 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
             </DialogHeader>
 
             {gift.imageUrl && (
-              <div className="w-full h-36 overflow-hidden border border-border/50 mt-2">
-                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-cover" />
+              <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
+                <div
+                  className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                  style={{ backgroundImage: `url(${gift.imageUrl})` }}
+                />
+                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
               </div>
             )}
 
@@ -311,13 +548,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={gift.pixKey || ""} size={200} />
+                <QRCode value={pixPayload} size={200} />
               </div>
 
               <div className="w-full space-y-2">
                 <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={gift.pixKey || ""} readOnly className="font-mono text-xs text-center" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
                   <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -331,56 +568,48 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           ) : (
             /* Case 3: Just reserved — success screen with payment links */
             <div className="py-6 flex flex-col items-center text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-              <CheckCircle2 className="w-8 h-8 text-primary" />
-            </div>
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 animate-bounce">
+                <CheckCircle2 className="w-8 h-8 text-primary" />
+              </div>
 
-            <div className="space-y-2">
-              <h3 className="font-serif text-2xl font-medium text-foreground">Reserva Confirmada!</h3>
-              <p className="text-muted-foreground px-4">
-                Muito obrigado pelo carinho! Realize o pagamento agora através de uma das opções abaixo.
-              </p>
-            </div>
+              <div className="space-y-2">
+                <h3 className="font-serif text-2xl font-medium text-foreground">Reserva Confirmada!</h3>
+                <p className="text-muted-foreground px-4">
+                  Muito obrigado pelo carinho! Realize o pagamento agora através de uma das opções abaixo.
+                </p>
+              </div>
 
-            <div className="w-full flex flex-col gap-3 pt-4">
-              {gift.pixChargeType === "PIX_KEY" && gift.pixKey ? (
+              <div className="w-full flex flex-col gap-3 pt-4">
                 <Button
                   onClick={() => setShowPixQrCode(true)}
                   className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
                 >
                   <QrCode className="w-5 h-5 mr-2" />
-                  Pagar via PIX
+                  Presentear com PIX
                 </Button>
-              ) : gift.pixLink ? (
-                <Button asChild className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors">
-                  <a href={gift.pixLink} target="_blank" rel="noreferrer">
-                    <QrCode className="w-5 h-5 mr-2" />
-                    Pagar via PIX
-                  </a>
+                <Button 
+                  onClick={handleCreditCheckout} 
+                  disabled={isGeneratingCheckout}
+                  variant="outline" 
+                  className="w-full h-12 border-border text-foreground hover:bg-muted"
+                >
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão"}
                 </Button>
-              ) : null}
-              {gift.creditLink && (
-                <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
-                  <a href={gift.creditLink} target="_blank" rel="noreferrer">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Pagar no Crédito
-                  </a>
-                </Button>
-              )}
-              {gift.productLink && (
-                <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
-                  <a href={gift.productLink} target="_blank" rel="noreferrer">
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                    Comprar diretamente no site
-                  </a>
-                </Button>
-              )}
-            </div>
+                {gift.productLink && (
+                  <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
+                    <a href={gift.productLink} target="_blank" rel="noreferrer">
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Comprar diretamente no site
+                    </a>
+                  </Button>
+                )}
+              </div>
 
-            <Button variant="ghost" onClick={onClose} className="mt-2 text-muted-foreground hover:text-foreground">
-              Fechar
-            </Button>
-          </div>
+              <Button variant="ghost" onClick={onClose} className="mt-2 text-muted-foreground hover:text-foreground">
+                Fechar
+              </Button>
+            </div>
           )
         ) : (
           /* Case 4: Reserved by someone else */
@@ -392,6 +621,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           </div>
         )}
       </DialogContent>
+      {showRain && <RainOverlay />}
     </Dialog>
   );
 }

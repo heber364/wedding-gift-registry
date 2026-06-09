@@ -17,13 +17,12 @@ export interface Gift {
   /** @nullable */
   imageUrl?: string | null;
   price: number;
-  pixChargeType?: "LINK" | "PIX_KEY";
+
   /** @nullable */
-  pixLink?: string | null;
+
   /** @nullable */
-  pixKey?: string | null;
+
   /** @nullable */
-  creditLink?: string | null;
   /**
      * Direct link to buy the product on a store website
      * @nullable
@@ -58,7 +57,6 @@ export interface GiftInput {
   pixChargeType?: "LINK" | "PIX_KEY";
   pixLink?: string;
   pixKey?: string;
-  creditLink?: string;
   /** Direct link to buy the product on a store website */
   productLink?: string;
   category?: string;
@@ -75,7 +73,6 @@ export interface GiftUpdate {
   pixChargeType?: "LINK" | "PIX_KEY";
   pixLink?: string;
   pixKey?: string;
-  creditLink?: string;
   /** Direct link to buy the product on a store website */
   productLink?: string;
   category?: string;

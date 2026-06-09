@@ -4,6 +4,9 @@ import type { Gift } from "@/lib/api-client-react";
 import { formatCurrency } from "@/lib/formatters";
 import { loadGuestIdentity } from "@/lib/guest-identity";
 import { ExternalLink } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 interface GiftCardProps {
   gift: Gift;
@@ -17,13 +20,13 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
     isReserved && guestIdentity?.phone && gift.reservedByPhone === guestIdentity.phone;
 
   return (
-    <div
+    <Card
       className={`
-        group relative flex flex-col bg-card border border-border/40 overflow-hidden rounded-xl
+        group relative flex flex-col border-border/40 overflow-hidden
         transition-all duration-500 ease-out
         ${isReserved && !isOwnReservation
           ? "opacity-55 grayscale-[0.4]"
-          : "hover:border-primary/50 hover:shadow-[0_0_30px_rgba(138,28,48,0.15)] hover:-translate-y-1"
+          : "hover:border-primary/50 hover:shadow-glow-primary hover:-translate-y-1"
         }
       `}
     >
@@ -32,14 +35,20 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
         onClick={onClick}
         className="flex flex-col flex-grow cursor-pointer"
       >
-        <div className="aspect-[4/3] w-full bg-muted/20 relative overflow-hidden">
+        <div className="aspect-[4/3] w-full bg-muted/20 relative overflow-hidden flex items-center justify-center">
           {gift.imageUrl ? (
-            <img
-              src={gift.imageUrl}
-              alt={gift.name}
-              className={`w-full h-full object-cover transition-transform duration-700 ${!isReserved && "group-hover:scale-105"}`}
-              loading="lazy"
-            />
+            <>
+              <div
+                className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                style={{ backgroundImage: `url(${gift.imageUrl})` }}
+              />
+              <img
+                src={gift.imageUrl}
+                alt={gift.name}
+                className={`w-full h-full object-contain relative z-10 transition-transform duration-700 ${!isReserved && "group-hover:scale-105"}`}
+                loading="lazy"
+              />
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground font-serif italic bg-muted/10">
               Sem Imagem
@@ -47,31 +56,27 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
           )}
 
           {isReserved && !isOwnReservation && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
-              <div className="bg-background/90 border border-border px-6 py-2 shadow-2xl">
-                <span className="font-serif text-lg tracking-widest text-muted-foreground uppercase">
-                  Reservado
-                </span>
-              </div>
+            <div className="absolute inset-0 z-20 bg-background/60 flex items-center justify-center backdrop-blur-[2px]">
+              <Badge variant="secondary" className="bg-background/90 border-border px-6 py-2 shadow-2xl font-serif text-lg tracking-widest text-muted-foreground uppercase  hover:bg-background/90">
+                Reservado
+              </Badge>
             </div>
           )}
 
           {isOwnReservation && (
-            <div className="absolute inset-0 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
-              <div className="bg-primary/80 border border-primary px-5 py-2 shadow-2xl">
-                <span className="font-serif text-sm tracking-widest text-primary-foreground uppercase">
-                  Seu Presente
-                </span>
-              </div>
+            <div className="absolute inset-0 z-20 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
+              <Badge variant="default" className="bg-primary/80 border-primary px-5 py-2 shadow-2xl font-serif text-sm tracking-widest text-primary-foreground uppercase  hover:bg-primary/80">
+                Seu Presente
+              </Badge>
             </div>
           )}
         </div>
 
-        <div className="p-5 flex flex-col flex-grow">
+        <CardContent className="p-5 flex flex-col flex-grow border-none shadow-none">
           {gift.category && (
-            <span className="text-xs tracking-[0.2em] text-primary uppercase mb-2 font-medium">
+            <Badge variant="outline" className="w-fit border-primary/20 text-xs tracking-[0.2em] text-primary uppercase mb-3 font-medium bg-primary/5 rounded-sm">
               {gift.category}
-            </span>
+            </Badge>
           )}
 
           <h3 className="font-serif text-xl font-medium text-foreground mb-2 line-clamp-2">
@@ -99,7 +104,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
               </span>
             )}
           </div>
-        </div>
+        </CardContent>
       </div>
 
       {/* Product link — sits outside the main click area */}
@@ -110,15 +115,14 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className={`
-              flex items-center justify-center gap-2 w-full py-2 text-xs uppercase tracking-widest font-medium
-              border border-border/40 text-muted-foreground rounded-md
-              transition-all duration-300
-              hover:border-primary/50 hover:text-primary hover:bg-primary/5
-              ${isReserved && !isOwnReservation ? "pointer-events-none opacity-40" : ""}
-            `}
+            className={buttonVariants({
+              variant: "outline",
+              size: "sm",
+              className: `w-full uppercase tracking-widest border-border/40 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all duration-300 rounded-md
+              ${isReserved && !isOwnReservation ? "pointer-events-none opacity-40" : ""}`
+            })}
           >
-            <ExternalLink className="w-3.5 h-3.5" />
+            <ExternalLink className="w-3.5 h-3.5 mr-2" />
             Ver Produto
           </a>
         </div>
@@ -129,6 +133,7 @@ export function GiftCard({ gift, onClick }: GiftCardProps) {
       <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-    </div>
+    </Card>
   );
 }
+
