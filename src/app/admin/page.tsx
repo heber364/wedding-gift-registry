@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
@@ -294,10 +295,27 @@ export default function AdminDashboard() {
                             <DropdownMenuItem onClick={() => toggleVisibility(gift)} className="cursor-pointer">
                               {gift.isActive !== false ? <><EyeOff className="w-4 h-4 mr-2" /> Ocultar</> : <><Eye className="w-4 h-4 mr-2" /> Exibir</>}
                             </DropdownMenuItem>
-                            {gift.isReserved && !gift.isPurchased && (
-                              <DropdownMenuItem onClick={() => handleUnreserve(gift.id)} className="cursor-pointer text-orange-500 focus:text-orange-600 focus:bg-orange-500/10">
-                                <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
-                              </DropdownMenuItem>
+                            {gift.isReserved && (
+                              gift.isPurchased ? (
+                                <TooltipProvider>
+                                  <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                      <span>
+                                        <DropdownMenuItem disabled className="cursor-not-allowed opacity-50">
+                                          <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
+                                        </DropdownMenuItem>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left">
+                                      <p>Não é possível desfazer reserva de um presente já comprado</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ) : (
+                                <DropdownMenuItem onClick={() => handleUnreserve(gift.id)} className="cursor-pointer text-orange-500 focus:text-orange-600 focus:bg-orange-500/10">
+                                  <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
+                                </DropdownMenuItem>
+                              )
                             )}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => handleDelete(gift.id)} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
