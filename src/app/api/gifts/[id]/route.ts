@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { giftsTable } from "@/db/schema";
-import { GetGiftParams, UpdateGiftParams, UpdateGiftBody, DeleteGiftParams } from "@/lib/api-zod";
+import { GetGiftParams, UpdateGiftParams, UpdateGiftBody, DeleteGiftParams } from "@/schemas/gift";
 import { eq } from "drizzle-orm";
 
 function serializeGift(g: typeof giftsTable.$inferSelect) {

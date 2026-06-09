@@ -10,9 +10,9 @@ import {
   useUnreserveGiftByGuest,
   getListGiftsQueryKey,
   getGetGiftsSummaryQueryKey,
-} from "@/lib/api-client-react";
+} from "@/hooks/useGifts";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Gift } from "@/lib/api-client-react";
+import type { Gift } from "@/hooks/useGifts";
 import { formatCurrency } from "@/lib/formatters";
 import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft, ShoppingCart } from "lucide-react";
 import { saveGuestIdentity, loadGuestIdentity } from "@/lib/guest-identity";

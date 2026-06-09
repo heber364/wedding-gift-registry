@@ -8,9 +8,9 @@ import {
   useUpdateGift,
   getListGiftsQueryKey,
   getGetGiftsSummaryQueryKey
-} from "@/lib/api-client-react";
+} from "@/hooks/useGifts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { customFetch } from "@/lib/api-client-react/custom-fetch";
+import { customFetch } from "@/services/api/client";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { 
@@ -24,7 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
-import type { Gift } from "@/lib/api-client-react";
+import type { Gift } from "@/hooks/useGifts";
 import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard } from "lucide-react";
 import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
