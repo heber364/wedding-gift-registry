@@ -183,12 +183,12 @@ export default function Home() {
 
         {/* Controls (Filter + Sort) */}
         {!isLoading && (
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col gap-6 mb-12">
             {/* Category Tabs */}
-            <div className="flex flex-wrap justify-center lg:justify-start flex-1">
+            <div className="w-full flex justify-center">
               {categories.length > 1 && (
-                <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-                  <TabsList className="bg-transparent flex flex-wrap h-auto gap-2 p-0 justify-center lg:justify-start">
+                <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full max-w-4xl">
+                  <TabsList className="bg-transparent flex flex-wrap h-auto gap-2 p-0 justify-center">
                     {categories.map((cat) => (
                       <TabsTrigger
                         key={cat}
@@ -205,8 +205,9 @@ export default function Home() {
 
             {/* Sort Dropdown & Filters */}
             {gifts && gifts.length > 0 && (
-              <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4 items-center shrink-0">
-                <div className="relative w-full sm:w-[220px]">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
+                {/* Search Bar - Left */}
+                <div className="relative w-full lg:max-w-md flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input 
                     value={searchQuery}
@@ -216,27 +217,30 @@ export default function Home() {
                   />
                 </div>
                 
-                <Select value={activeFilter} onValueChange={setActiveFilter}>
-                  <SelectTrigger className="w-full sm:w-[160px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border/60">
-                    <SelectItem value="Todos" className="cursor-pointer">Todos os Status</SelectItem>
-                    <SelectItem value="Disponíveis" className="cursor-pointer">Disponíveis</SelectItem>
-                    <SelectItem value="Reservados" className="cursor-pointer">Reservados</SelectItem>
-                  </SelectContent>
-                </Select>
+                {/* Status and Sort Filters - Right */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0 justify-end">
+                  <Select value={activeFilter} onValueChange={setActiveFilter}>
+                    <SelectTrigger className="w-full sm:w-[160px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border/60">
+                      <SelectItem value="Todos" className="cursor-pointer">Todos os Status</SelectItem>
+                      <SelectItem value="Disponíveis" className="cursor-pointer">Disponíveis</SelectItem>
+                      <SelectItem value="Reservados" className="cursor-pointer">Reservados</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
-                  <SelectTrigger className="w-full sm:w-[180px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
-                    <SelectValue placeholder="Ordenar por" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border/60">
-                    <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
-                    <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
-                    <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
+                    <SelectTrigger className="w-full sm:w-[180px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border/60">
+                      <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
+                      <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
+                      <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
           </div>
