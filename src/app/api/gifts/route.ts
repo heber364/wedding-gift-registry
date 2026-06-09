@@ -1,26 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { giftsTable } from "@/db/schema";
-import { CreateGiftBody } from "@/lib/api-zod";
+import { giftsTable, insertGiftSchema, serializeGift } from "@/db/schema/gifts";
+import { CreateGiftBody } from "@/schemas/gift";
 import { eq } from "drizzle-orm";
 
-function serializeGift(g: typeof giftsTable.$inferSelect) {
-  return {
-    id: g.id,
-    name: g.name,
-    description: g.description ?? null,
-    imageUrl: g.imageUrl ?? null,
-    price: parseFloat(g.price as unknown as string),
-    productLink: g.productLink ?? null,
-    category: g.category ?? null,
-    isReserved: g.isReserved,
-    reservedBy: g.reservedBy ?? null,
-    reservedByPhone: g.reservedByPhone ?? null,
-    reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
-    isActive: g.isActive,
-    createdAt: g.createdAt.toISOString(),
-  };
-}
 
 export async function GET() {
   try {

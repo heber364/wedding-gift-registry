@@ -5,12 +5,12 @@ import dynamic from "next/dynamic";
 
 // @ts-ignore - suppress TS deep import error
 
-import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
+import { useListGifts, useGetGiftsSummary } from "@/hooks/useGifts";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import type { Gift } from "@/lib/api-client-react";
+import type { Gift } from "@/hooks/useGifts";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -22,6 +22,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 type SortOption = "default" | "price-asc" | "price-desc";
 
@@ -35,6 +37,8 @@ export default function Home() {
 
   const [selectedGift, setSelectedGift] = useState<Gift | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Todos");
+  const [activeFilter, setActiveFilter] = useState<string>("Todos"); // Todos, Disponíveis, Reservados
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOption, setSortOption] = useState<SortOption>("default");
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -52,6 +56,20 @@ export default function Home() {
       result = result.filter((g) => g.category === activeCategory);
     }
 
+    if (activeFilter === "Disponíveis") {
+      result = result.filter((g) => !g.isReserved && !g.isPurchased);
+    } else if (activeFilter === "Reservados") {
+      result = result.filter((g) => g.isReserved || g.isPurchased);
+    }
+
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((g) => 
+        g.name.toLowerCase().includes(q) || 
+        (g.description && g.description.toLowerCase().includes(q))
+      );
+    }
+
     if (sortOption === "price-asc") {
       result = [...result].sort((a, b) => a.price - b.price);
     } else if (sortOption === "price-desc") {
@@ -59,7 +77,7 @@ export default function Home() {
     }
 
     return result;
-  }, [gifts, activeCategory, sortOption]);
+  }, [gifts, activeCategory, activeFilter, searchQuery, sortOption]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -165,12 +183,12 @@ export default function Home() {
 
         {/* Controls (Filter + Sort) */}
         {!isLoading && (
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col gap-6 mb-12">
             {/* Category Tabs */}
-            <div className="flex flex-wrap justify-center lg:justify-start flex-1">
+            <div className="w-full flex justify-center">
               {categories.length > 1 && (
-                <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-                  <TabsList className="bg-transparent flex flex-wrap h-auto gap-2 p-0 justify-center lg:justify-start">
+                <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full max-w-4xl">
+                  <TabsList className="bg-transparent flex flex-wrap h-auto gap-2 p-0 justify-center">
                     {categories.map((cat) => (
                       <TabsTrigger
                         key={cat}
@@ -185,19 +203,44 @@ export default function Home() {
               )}
             </div>
 
-            {/* Sort Dropdown */}
+            {/* Sort Dropdown & Filters */}
             {gifts && gifts.length > 0 && (
-              <div className="w-full sm:w-auto shrink-0 flex justify-end">
-                <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
-                  <SelectTrigger className="w-full sm:w-[220px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
-                    <SelectValue placeholder="Ordenar por" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border/60">
-                    <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
-                    <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
-                    <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
+                {/* Search Bar - Left */}
+                <div className="relative w-full lg:max-w-md flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar presente..." 
+                    className="pl-9 h-10 w-full border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors"
+                  />
+                </div>
+                
+                {/* Status and Sort Filters - Right */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0 justify-end">
+                  <Select value={activeFilter} onValueChange={setActiveFilter}>
+                    <SelectTrigger className="w-full sm:w-[160px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border/60">
+                      <SelectItem value="Todos" className="cursor-pointer">Todos os Status</SelectItem>
+                      <SelectItem value="Disponíveis" className="cursor-pointer">Disponíveis</SelectItem>
+                      <SelectItem value="Reservados" className="cursor-pointer">Reservados</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
+                    <SelectTrigger className="w-full sm:w-[180px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-card border-border/60">
+                      <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
+                      <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
+                      <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
           </div>
@@ -233,8 +276,13 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 text-center border-t border-border/30 text-muted-foreground">
+      <footer className="py-12 text-center border-t border-border/30 text-muted-foreground flex flex-col items-center gap-4">
         <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
+        <div className="text-sm max-w-sm px-4">
+          <p className="font-medium text-foreground">Endereço para entrega de presentes físicos:</p>
+          <p>Condomínio Montserrat 3, Número 1250</p>
+          <p>CEP: 45097-400</p>
+        </div>
       </footer>
 
       {/* Modals */}

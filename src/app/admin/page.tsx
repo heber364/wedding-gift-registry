@@ -8,9 +8,9 @@ import {
   useUpdateGift,
   getListGiftsQueryKey,
   getGetGiftsSummaryQueryKey
-} from "@/lib/api-client-react";
+} from "@/hooks/useGifts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { customFetch } from "@/lib/api-client-react/custom-fetch";
+import { customFetch } from "@/services/api/client";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { 
@@ -22,16 +22,25 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
-import type { Gift } from "@/lib/api-client-react";
-import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard } from "lucide-react";
+import type { Gift } from "@/hooks/useGifts";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   
   const { data: gifts, isLoading } = useQuery({
@@ -60,8 +69,7 @@ export default function AdminDashboard() {
       { id: gift.id, data: { isActive: !gift.isActive } },
       {
         onSuccess: () => {
-          toast({
-            title: "Sucesso",
+          toast.success("Sucesso", {
             description: `Presente ${!gift.isActive ? "exibido" : "ocultado"} com sucesso.`,
           });
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
@@ -69,10 +77,8 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
         },
         onError: () => {
-          toast({
-            title: "Erro",
+          toast.error("Erro", {
             description: "Ocorreu um erro ao alterar a visibilidade do presente.",
-            variant: "destructive",
           });
         },
       }
@@ -110,7 +116,7 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-          toast({ title: "Presente removido com sucesso." });
+          toast.success("Presente removido com sucesso.");
         }
       });
     }
@@ -123,7 +129,7 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-          toast({ title: "Reserva cancelada com sucesso." });
+          toast.success("Reserva cancelada com sucesso.");
         }
       });
     }
@@ -182,29 +188,37 @@ export default function AdminDashboard() {
             <Table>
               <TableHeader className="bg-muted/20">
                 <TableRow className="border-border/50">
+                  <TableHead className="w-16"></TableHead>
                   <TableHead className="font-serif">Presente</TableHead>
                   <TableHead className="font-serif text-right">Valor</TableHead>
                   <TableHead className="font-serif">Status</TableHead>
                   <TableHead className="font-serif">Reserva</TableHead>
+                  <TableHead className="font-serif text-center">Link</TableHead>
                   <TableHead className="text-right font-serif">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       Carregando presentes...
                     </TableCell>
                   </TableRow>
                 ) : gifts?.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       Nenhum presente cadastrado.
                     </TableCell>
                   </TableRow>
                 ) : (
                   gifts?.map((gift) => (
                     <TableRow key={gift.id} className="border-border/50 hover:bg-muted/10">
+                      <TableCell>
+                        <Avatar className="h-10 w-10 border border-border/50">
+                          <AvatarImage src={gift.imageUrl || ""} alt={gift.name} className="object-cover" />
+                          <AvatarFallback className="bg-muted"><ImageIcon className="w-4 h-4 text-muted-foreground" /></AvatarFallback>
+                        </Avatar>
+                      </TableCell>
                       <TableCell className="font-medium">
                         <div className="flex flex-col">
                           <span>{gift.name}</span>
@@ -215,7 +229,11 @@ export default function AdminDashboard() {
                       </TableCell>
                       <TableCell className="text-right">{formatCurrency(gift.price)}</TableCell>
                       <TableCell>
-                        {gift.isReserved ? (
+                        {gift.isPurchased ? (
+                          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">
+                            Comprado
+                          </Badge>
+                        ) : gift.isReserved ? (
                           <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                             Reservado
                           </Badge>
@@ -245,63 +263,66 @@ export default function AdminDashboard() {
                           <span className="text-muted-foreground text-sm">-</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        {gift.isReserved ? (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => handleUnreserve(gift.id)}
-                            title="Desfazer Reserva"
-                            className="text-orange-500 hover:text-orange-600 hover:bg-orange-500/10"
-                          >
-                            <Unlock className="w-4 h-4" />
-                          </Button>
-                        ) : null}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleEdit(gift)}
-                          title="Editar"
-                          className="hover:bg-muted"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDuplicate(gift)}
-                          title="Duplicar"
-                          className="hover:bg-muted"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => setTestGift(gift)}
-                          title="Testar Pagamento"
-                          className="hover:bg-muted text-blue-500 hover:text-blue-600"
-                        >
-                          <CreditCard className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => toggleVisibility(gift)}
-                          title={gift.isActive !== false ? "Ocultar da Vitrine" : "Exibir na Vitrine"}
-                          className="hover:bg-muted"
-                        >
-                          {gift.isActive !== false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleDelete(gift.id)}
-                          title="Excluir"
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                      <TableCell className="text-center">
+                        {gift.productLink ? (
+                          <a href={gift.productLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary transition-colors">
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Abrir menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-card border-border/50">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleEdit(gift)} className="cursor-pointer">
+                              <Edit2 className="w-4 h-4 mr-2" /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(gift)} className="cursor-pointer">
+                              <Copy className="w-4 h-4 mr-2" /> Duplicar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setTestGift(gift)} className="cursor-pointer">
+                              <CreditCard className="w-4 h-4 mr-2" /> Testar Pagamento
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toggleVisibility(gift)} className="cursor-pointer">
+                              {gift.isActive !== false ? <><EyeOff className="w-4 h-4 mr-2" /> Ocultar</> : <><Eye className="w-4 h-4 mr-2" /> Exibir</>}
+                            </DropdownMenuItem>
+                            {gift.isReserved && (
+                              gift.isPurchased ? (
+                                <TooltipProvider>
+                                  <Tooltip delayDuration={300}>
+                                    <TooltipTrigger asChild>
+                                      <span>
+                                        <DropdownMenuItem disabled className="cursor-not-allowed opacity-50">
+                                          <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
+                                        </DropdownMenuItem>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left">
+                                      <p>Não é possível desfazer reserva de um presente já comprado</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              ) : (
+                                <DropdownMenuItem onClick={() => handleUnreserve(gift.id)} className="cursor-pointer text-orange-500 focus:text-orange-600 focus:bg-orange-500/10">
+                                  <Unlock className="w-4 h-4 mr-2" /> Desfazer Reserva
+                                </DropdownMenuItem>
+                              )
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleDelete(gift.id)} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                              <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))
