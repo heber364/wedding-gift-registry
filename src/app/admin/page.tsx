@@ -22,7 +22,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
 import type { Gift } from "@/hooks/useGifts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -40,7 +40,6 @@ import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   
   const { data: gifts, isLoading } = useQuery({
@@ -69,8 +68,7 @@ export default function AdminDashboard() {
       { id: gift.id, data: { isActive: !gift.isActive } },
       {
         onSuccess: () => {
-          toast({
-            title: "Sucesso",
+          toast.success("Sucesso", {
             description: `Presente ${!gift.isActive ? "exibido" : "ocultado"} com sucesso.`,
           });
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
@@ -78,10 +76,8 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
         },
         onError: () => {
-          toast({
-            title: "Erro",
+          toast.error("Erro", {
             description: "Ocorreu um erro ao alterar a visibilidade do presente.",
-            variant: "destructive",
           });
         },
       }
@@ -119,7 +115,7 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-          toast({ title: "Presente removido com sucesso." });
+          toast.success("Presente removido com sucesso.");
         }
       });
     }
@@ -132,7 +128,7 @@ export default function AdminDashboard() {
           queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
           queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-          toast({ title: "Reserva cancelada com sucesso." });
+          toast.success("Reserva cancelada com sucesso.");
         }
       });
     }

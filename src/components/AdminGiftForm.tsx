@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useCreateGift,
@@ -54,7 +54,6 @@ interface AdminGiftFormProps {
 }
 
 export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftFormProps) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createGift = useCreateGift();
@@ -118,10 +117,10 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
             queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
             queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
             queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-            toast({ title: "Presente atualizado com sucesso." });
+            toast.success("Presente atualizado com sucesso.");
             onClose();
           },
-          onError: () => toast({ variant: "destructive", title: "Erro ao atualizar." }),
+          onError: () => toast.error("Erro", { description: "Erro ao atualizar." }),
         }
       );
     } else {
@@ -132,13 +131,11 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
             queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
             queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
             queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
-            toast({ title: isDuplicate ? "Presente duplicado com sucesso." : "Presente criado com sucesso." });
+            toast.success(isDuplicate ? "Presente duplicado com sucesso." : "Presente criado com sucesso.");
             onClose();
           },
           onError: () => {
-            toast({
-              variant: "destructive",
-              title: "Erro ao salvar",
+            toast.error("Erro ao salvar", {
               description: "Verifique os dados e tente novamente.",
             });
           },

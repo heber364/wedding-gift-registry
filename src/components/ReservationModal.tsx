@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   useReserveGift,
   useUnreserveGiftByGuest,
@@ -156,7 +156,6 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [showRain, setShowRain] = useState(false);
   const [pixPayload, setPixPayload] = useState("");
   const [isGeneratingCheckout, setIsGeneratingCheckout] = useState(false);
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
   const unreserveByGuest = useUnreserveGiftByGuest();
@@ -213,9 +212,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const handleReserve = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Preencha todos os campos",
+      toast.error("Preencha todos os campos", {
         description: "Nome e telefone são obrigatórios.",
       });
       return;
@@ -238,9 +235,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           setIsSuccess(true);
         },
         onError: () => {
-          toast({
-            variant: "destructive",
-            title: "Erro na reserva",
+          toast.error("Erro na reserva", {
             description: "Não foi possível reservar. O presente pode já ter sido reservado.",
           });
         },
@@ -261,15 +256,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           setShowRain(true);
           setTimeout(() => {
             setShowRain(false);
-            toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
+            toast.success("Reserva cancelada", { description: "Seu presente foi liberado com sucesso." });
             onClose();
           }, 2500);
         },
         onError: () => {
           setIsUnreserving(false);
-          toast({
-            variant: "destructive",
-            title: "Erro",
+          toast.error("Erro", {
             description: "Não foi possível cancelar a reserva.",
           });
         },
@@ -280,7 +273,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const handleCopyPix = () => {
     if (pixPayload) {
       navigator.clipboard.writeText(pixPayload);
-      toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
+      toast.success("Chave PIX copiada!", { description: "Você já pode colar no app do seu banco." });
     }
   };
 
@@ -299,17 +292,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         window.open(data.url, '_blank', 'noopener,noreferrer');
         setIsGeneratingCheckout(false);
       } else {
-        toast({
-          variant: "destructive",
-          title: "Erro ao gerar pagamento",
+        toast.error("Erro ao gerar pagamento", {
           description: data.error || "Tente novamente mais tarde.",
         });
         setIsGeneratingCheckout(false);
       }
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao gerar pagamento",
+      toast.error("Erro ao gerar pagamento", {
         description: "Não foi possível conectar ao Mercado Pago.",
       });
       setIsGeneratingCheckout(false);
