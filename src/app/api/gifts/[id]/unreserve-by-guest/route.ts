@@ -14,6 +14,7 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     productLink: g.productLink ?? null,
     category: g.category ?? null,
     isReserved: g.isReserved,
+    isPurchased: g.isPurchased,
     reservedBy: g.reservedBy ?? null,
     reservedByPhone: g.reservedByPhone ?? null,
     reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
@@ -33,6 +34,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     const [existing] = await db.select().from(giftsTable).where(eq(giftsTable.id, parsedParams.data.id));
     if (!existing || !existing.isReserved) return NextResponse.json({ error: "Gift not found or not reserved" }, { status: 404 });
+
+    if (existing.isPurchased) {
+      return NextResponse.json({ error: "Não é possível cancelar uma reserva de um presente que já foi comprado. Entre em contato com os noivos." }, { status: 400 });
+    }
 
     if (existing.reservedByPhone !== parsed.data.phone) {
       return NextResponse.json({ error: "Phone does not match reservation" }, { status: 403 });

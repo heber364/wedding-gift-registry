@@ -11,6 +11,7 @@ export const giftsTable = pgTable("gifts", {
   productLink: text("product_link"),
   category: text("category"),
   isReserved: boolean("is_reserved").notNull().default(false),
+  isPurchased: boolean("is_purchased").notNull().default(false),
   reservedBy: text("reserved_by"),
   reservedByPhone: text("reserved_by_phone"),
   reservedAt: timestamp("reserved_at"),
@@ -21,6 +22,7 @@ export const giftsTable = pgTable("gifts", {
 export const insertGiftSchema = createInsertSchema(giftsTable).omit({
   id: true,
   isReserved: true,
+  isPurchased: true,
   reservedBy: true,
   reservedByPhone: true,
   reservedAt: true,

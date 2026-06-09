@@ -12,6 +12,7 @@ function serializeGift(g: typeof giftsTable.$inferSelect) {
     productLink: g.productLink ?? null,
     category: g.category ?? null,
     isReserved: g.isReserved,
+    isPurchased: g.isPurchased,
     reservedBy: g.reservedBy ?? null,
     reservedByPhone: g.reservedByPhone ?? null,
     reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
