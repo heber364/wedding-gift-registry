@@ -5,12 +5,12 @@ import dynamic from "next/dynamic";
 
 // @ts-ignore - suppress TS deep import error
 
-import { useListGifts, useGetGiftsSummary } from "@/lib/api-client-react";
+import { useListGifts, useGetGiftsSummary } from "@/hooks/useGifts";
 import { GiftCard } from "@/components/GiftCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import type { Gift } from "@/lib/api-client-react";
+import type { Gift } from "@/hooks/useGifts";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,

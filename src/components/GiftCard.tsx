@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import type { Gift } from "@/lib/api-client-react";
+import type { Gift } from "@/hooks/useGifts";
 import { formatCurrency } from "@/lib/formatters";
 import { loadGuestIdentity } from "@/lib/guest-identity";
 import { ExternalLink } from "lucide-react";
