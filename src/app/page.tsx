@@ -272,8 +272,13 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 text-center border-t border-border/30 text-muted-foreground">
+      <footer className="py-12 text-center border-t border-border/30 text-muted-foreground flex flex-col items-center gap-4">
         <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
+        <div className="text-sm max-w-sm px-4">
+          <p className="font-medium text-foreground">Endereço para entrega de presentes físicos:</p>
+          <p>Condomínio Montserrat 3, Número 1250</p>
+          <p>CEP: 45097-400</p>
+        </div>
       </footer>
 
       {/* Modals */}

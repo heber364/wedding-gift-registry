@@ -441,12 +441,19 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
                   </Button>
                   {gift.productLink && (
-                    <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
-                      <a href={gift.productLink} target="_blank" rel="noreferrer">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Comprar diretamente no site
-                      </a>
-                    </Button>
+                    <div className="w-full flex flex-col gap-2">
+                      <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
+                        <a href={gift.productLink} target="_blank" rel="noreferrer">
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Comprar diretamente no site
+                        </a>
+                      </Button>
+                      <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
+                        <strong>Endereço para entrega:</strong><br />
+                        Condomínio Montserrat 3, Número 1250<br />
+                        CEP: 45097-400
+                      </p>
+                    </div>
                   )}
                   <Button
                     variant="ghost"
@@ -597,12 +604,19 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                   {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão"}
                 </Button>
                 {gift.productLink && (
-                  <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
-                    <a href={gift.productLink} target="_blank" rel="noreferrer">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Comprar diretamente no site
-                    </a>
-                  </Button>
+                  <div className="w-full flex flex-col gap-2">
+                    <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
+                      <a href={gift.productLink} target="_blank" rel="noreferrer">
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        Comprar diretamente no site
+                      </a>
+                    </Button>
+                    <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
+                      <strong>Endereço para entrega:</strong><br />
+                      Condomínio Montserrat 3, Número 1250<br />
+                      CEP: 45097-400
+                    </p>
+                  </div>
                 )}
               </div>
 
