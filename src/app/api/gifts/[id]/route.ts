@@ -1,26 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { giftsTable } from "@/db/schema";
+import { giftsTable, serializeGift } from "@/db/schema/gifts";
 import { GetGiftParams, UpdateGiftParams, UpdateGiftBody, DeleteGiftParams } from "@/schemas/gift";
 import { eq } from "drizzle-orm";
-
-function serializeGift(g: typeof giftsTable.$inferSelect) {
-  return {
-    id: g.id,
-    name: g.name,
-    description: g.description ?? null,
-    imageUrl: g.imageUrl ?? null,
-    price: parseFloat(g.price as unknown as string),
-    productLink: g.productLink ?? null,
-    category: g.category ?? null,
-    isReserved: g.isReserved,
-    reservedBy: g.reservedBy ?? null,
-    reservedByPhone: g.reservedByPhone ?? null,
-    reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
-    isActive: g.isActive,
-    createdAt: g.createdAt.toISOString(),
-  };
-}
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -55,6 +37,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (parsed.data.productLink !== undefined) updates.productLink = parsed.data.productLink;
     if (parsed.data.category !== undefined) updates.category = parsed.data.category;
     if (parsed.data.isActive !== undefined) updates.isActive = parsed.data.isActive;
+    if (parsed.data.isPurchased !== undefined) updates.isPurchased = parsed.data.isPurchased;
 
     const [gift] = await db
       .update(giftsTable)

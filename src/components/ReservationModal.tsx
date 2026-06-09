@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   useReserveGift,
   useUnreserveGiftByGuest,
@@ -14,7 +14,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import type { Gift } from "@/hooks/useGifts";
 import { formatCurrency } from "@/lib/formatters";
-import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft, ShoppingCart } from "lucide-react";
+import { CreditCard, QrCode, CheckCircle2, Unlock, Copy, ArrowLeft, ShoppingCart, Check } from "lucide-react";
 import { saveGuestIdentity, loadGuestIdentity } from "@/lib/guest-identity";
 import QRCode from "react-qr-code";
 import confetti from "canvas-confetti";
@@ -156,7 +156,6 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const [showRain, setShowRain] = useState(false);
   const [pixPayload, setPixPayload] = useState("");
   const [isGeneratingCheckout, setIsGeneratingCheckout] = useState(false);
-  const { toast } = useToast();
   const queryClient = useQueryClient();
   const reserveGift = useReserveGift();
   const unreserveByGuest = useUnreserveGiftByGuest();
@@ -213,9 +212,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const handleReserve = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Preencha todos os campos",
+      toast.error("Preencha todos os campos", {
         description: "Nome e telefone são obrigatórios.",
       });
       return;
@@ -238,9 +235,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           setIsSuccess(true);
         },
         onError: () => {
-          toast({
-            variant: "destructive",
-            title: "Erro na reserva",
+          toast.error("Erro na reserva", {
             description: "Não foi possível reservar. O presente pode já ter sido reservado.",
           });
         },
@@ -261,15 +256,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
           setShowRain(true);
           setTimeout(() => {
             setShowRain(false);
-            toast({ title: "Reserva cancelada", description: "Seu presente foi liberado com sucesso." });
+            toast.success("Reserva cancelada", { description: "Seu presente foi liberado com sucesso." });
             onClose();
           }, 2500);
         },
         onError: () => {
           setIsUnreserving(false);
-          toast({
-            variant: "destructive",
-            title: "Erro",
+          toast.error("Erro", {
             description: "Não foi possível cancelar a reserva.",
           });
         },
@@ -280,7 +273,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
   const handleCopyPix = () => {
     if (pixPayload) {
       navigator.clipboard.writeText(pixPayload);
-      toast({ title: "Chave PIX copiada!", description: "Você já pode colar no app do seu banco." });
+      toast.success("Chave PIX copiada!", { description: "Você já pode colar no app do seu banco." });
     }
   };
 
@@ -299,17 +292,13 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         window.open(data.url, '_blank', 'noopener,noreferrer');
         setIsGeneratingCheckout(false);
       } else {
-        toast({
-          variant: "destructive",
-          title: "Erro ao gerar pagamento",
+        toast.error("Erro ao gerar pagamento", {
           description: data.error || "Tente novamente mais tarde.",
         });
         setIsGeneratingCheckout(false);
       }
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao gerar pagamento",
+      toast.error("Erro ao gerar pagamento", {
         description: "Não foi possível conectar ao Mercado Pago.",
       });
       setIsGeneratingCheckout(false);
@@ -424,40 +413,61 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                 </p>
 
                 <div className="flex flex-col gap-3 pt-2">
-                  <Button
-                    onClick={() => setShowPixQrCode(true)}
-                    className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
-                  >
-                    <QrCode className="w-4 h-4 mr-2" />
-                    Presentear com PIX
-                  </Button>
-                  <Button 
-                    onClick={handleCreditCheckout} 
-                    disabled={isGeneratingCheckout}
-                    variant="outline" 
-                    className="w-full h-11 border-border text-foreground hover:bg-muted"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
-                  </Button>
-                  {gift.productLink && (
-                    <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
-                      <a href={gift.productLink} target="_blank" rel="noreferrer">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Comprar diretamente no site
-                      </a>
-                    </Button>
+                  {gift.isPurchased ? (
+                    <div className="p-4 bg-muted/50 rounded-lg text-center space-y-2 border border-border">
+                      <div className="mx-auto w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
+                        <Check className="w-5 h-5" />
+                      </div>
+                      <h4 className="font-medium text-foreground">Presente já comprado</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Este presente já foi marcado como comprado. Agradecemos muito pelo carinho!
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => setShowPixQrCode(true)}
+                        className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
+                      >
+                        <QrCode className="w-4 h-4 mr-2" />
+                        Presentear com PIX
+                      </Button>
+                      <Button 
+                        onClick={handleCreditCheckout} 
+                        disabled={isGeneratingCheckout}
+                        variant="outline" 
+                        className="w-full h-11 border-border text-foreground hover:bg-muted"
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
+                      </Button>
+                      {gift.productLink && (
+                        <div className="w-full flex flex-col gap-2">
+                          <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
+                            <a href={gift.productLink} target="_blank" rel="noreferrer">
+                              <ShoppingCart className="w-4 h-4 mr-2" />
+                              Comprar diretamente no site
+                            </a>
+                          </Button>
+                          <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
+                            <strong>Endereço para entrega:</strong><br />
+                            Condomínio Montserrat 3, Número 1250<br />
+                            CEP: 45097-400
+                          </p>
+                        </div>
+                      )}
+                      <Button
+                        variant="ghost"
+                        onClick={handleCancelClick}
+                        disabled={isUnreserving || unreserveByGuest.isPending}
+                        style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
+                        className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
+                      >
+                        <Unlock className="w-4 h-4 mr-2" />
+                        {getCancelButtonText()}
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    variant="ghost"
-                    onClick={handleCancelClick}
-                    disabled={isUnreserving || unreserveByGuest.isPending}
-                    style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
-                    className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
-                  >
-                    <Unlock className="w-4 h-4 mr-2" />
-                    {getCancelButtonText()}
-                  </Button>
                   <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
                     Fechar
                   </Button>
@@ -597,12 +607,19 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                   {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão"}
                 </Button>
                 {gift.productLink && (
-                  <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
-                    <a href={gift.productLink} target="_blank" rel="noreferrer">
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Comprar diretamente no site
-                    </a>
-                  </Button>
+                  <div className="w-full flex flex-col gap-2">
+                    <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
+                      <a href={gift.productLink} target="_blank" rel="noreferrer">
+                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        Comprar diretamente no site
+                      </a>
+                    </Button>
+                    <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
+                      <strong>Endereço para entrega:</strong><br />
+                      Condomínio Montserrat 3, Número 1250<br />
+                      CEP: 45097-400
+                    </p>
+                  </div>
                 )}
               </div>
 

@@ -5,12 +5,11 @@ import { useVerifyAdmin } from "@/hooks/useAdmin";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Lock } from "lucide-react";
 
 export default function AdminLogin() {
   const router = useRouter();
-  const { toast } = useToast();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,9 +37,7 @@ export default function AdminLogin() {
           sessionStorage.setItem("adminAuth", "true");
           router.push("/admin");
         } else {
-          toast({
-            variant: "destructive",
-            title: "Acesso negado",
+          toast.error("Acesso negado", {
             description: "Senha incorreta. Tente novamente.",
           });
         }
@@ -48,9 +45,7 @@ export default function AdminLogin() {
       onError: (err) => {
         setIsLoading(false);
         console.error("Login error:", err);
-        toast({
-          variant: "destructive",
-          title: "Erro",
+        toast.error("Erro", {
           description: "Ocorreu um erro ao verificar a senha.",
         });
       }

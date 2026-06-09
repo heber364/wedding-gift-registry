@@ -1,25 +1,8 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { giftsTable } from "@/db/schema";
+import { giftsTable, serializeGift } from "@/db/schema/gifts";
 import { ReserveGiftParams, ReserveGiftBody, UnreserveGiftParams } from "@/schemas/gift";
 import { eq } from "drizzle-orm";
-
-function serializeGift(g: typeof giftsTable.$inferSelect) {
-  return {
-    id: g.id,
-    name: g.name,
-    description: g.description ?? null,
-    imageUrl: g.imageUrl ?? null,
-    price: parseFloat(g.price as unknown as string),
-    productLink: g.productLink ?? null,
-    category: g.category ?? null,
-    isReserved: g.isReserved,
-    reservedBy: g.reservedBy ?? null,
-    reservedByPhone: g.reservedByPhone ?? null,
-    reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
-    createdAt: g.createdAt.toISOString(),
-  };
-}
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -34,6 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const [existing] = await db.select().from(giftsTable).where(eq(giftsTable.id, parsedParams.data.id));
     if (!existing) return NextResponse.json({ error: "Gift not found" }, { status: 404 });
     if (existing.isReserved) return NextResponse.json({ error: "Gift already reserved" }, { status: 400 });
+    if (existing.isPurchased) return NextResponse.json({ error: "Não é possível reservar um presente já comprado" }, { status: 400 });
 
     const [gift] = await db
       .update(giftsTable)
@@ -59,6 +43,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   if (!parsed.success) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
 
   try {
+    const [existing] = await db.select().from(giftsTable).where(eq(giftsTable.id, parsed.data.id));
+    if (!existing) return NextResponse.json({ error: "Gift not found" }, { status: 404 });
+    if (existing.isPurchased) return NextResponse.json({ error: "Não é possível cancelar a reserva de um presente já comprado" }, { status: 400 });
+
     const [gift] = await db
       .update(giftsTable)
       .set({
