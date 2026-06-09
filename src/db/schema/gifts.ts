@@ -32,3 +32,22 @@ export const insertGiftSchema = createInsertSchema(giftsTable).omit({
 
 export type InsertGift = z.infer<typeof insertGiftSchema>;
 export type Gift = typeof giftsTable.$inferSelect;
+
+export function serializeGift(g: typeof giftsTable.$inferSelect) {
+  return {
+    id: g.id,
+    name: g.name,
+    description: g.description ?? null,
+    imageUrl: g.imageUrl ?? null,
+    price: parseFloat(g.price as unknown as string),
+    productLink: g.productLink ?? null,
+    category: g.category ?? null,
+    isReserved: g.isReserved,
+    isPurchased: g.isPurchased,
+    reservedBy: g.reservedBy ?? null,
+    reservedByPhone: g.reservedByPhone ?? null,
+    reservedAt: g.reservedAt ? g.reservedAt.toISOString() : null,
+    isActive: g.isActive,
+    createdAt: g.createdAt.toISOString(),
+  };
+}
