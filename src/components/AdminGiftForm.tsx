@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,6 +41,7 @@ const formSchema = z.object({
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
   productLink: z.string().optional(),
   category: z.string().optional(),
+  isPurchased: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -67,6 +69,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
       price: 0,
       productLink: "",
       category: "",
+      isPurchased: false,
     },
   });
 
@@ -80,6 +83,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           price: gift.price,
           productLink: gift.productLink || "",
           category: gift.category || "",
+          isPurchased: gift.isPurchased || false,
         });
       } else {
         form.reset({
@@ -89,6 +93,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           price: 0,
           productLink: "",
           category: "",
+          isPurchased: false,
         });
       }
     }
@@ -112,6 +117,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
             queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+            queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
             toast({ title: "Presente atualizado com sucesso." });
             onClose();
           },
@@ -125,6 +131,7 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: getListGiftsQueryKey() });
             queryClient.invalidateQueries({ queryKey: getGetGiftsSummaryQueryKey() });
+            queryClient.invalidateQueries({ queryKey: ["admin-gifts"] });
             toast({ title: isDuplicate ? "Presente duplicado com sucesso." : "Presente criado com sucesso." });
             onClose();
           },
@@ -248,7 +255,28 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
               )}
             />
 
-
+            {isEditing && (
+              <FormField
+                control={form.control}
+                name="isPurchased"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-border p-4 bg-background/50">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Marcar como Comprado</FormLabel>
+                      <div className="text-sm text-muted-foreground">
+                        Impede que o usuário cancele a reserva acidentalmente.
+                      </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={onClose} className="border-border hover:bg-muted">
