@@ -472,6 +472,7 @@ export default function AdminDashboard() {
         onClose={() => setFormOpen(false)} 
         gift={editingGift}
         isDuplicate={isDuplicate}
+        categories={categories}
       />
       {testGift && (
         <ReservationModal
