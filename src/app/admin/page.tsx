@@ -26,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { AdminGiftForm } from "@/components/AdminGiftForm";
 import type { Gift } from "@/hooks/useGifts";
+import { useTablePreferences, type SortField } from "@/hooks/useTablePreferences";
+import { DataTableFilter, type FilterCondition } from "@/components/DataTableFilter";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -96,12 +98,27 @@ export default function AdminDashboard() {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [testGift, setTestGift] = useState<Gift | null>(null);
 
-  type SortField = 'name' | 'category' | 'price' | null;
-  type SortDirection = 'asc' | 'desc';
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const {
+    sortField, setSortField,
+    sortDirection, setSortDirection,
+    selectedGiftIds, setSelectedGiftIds,
+    selectedCategories, setSelectedCategories,
+    selectedStatuses, setSelectedStatuses,
+    selectedPrices, setSelectedPrices,
+    nameCondition, setNameCondition,
+    categoryCondition, setCategoryCondition,
+    statusCondition, setStatusCondition,
+    priceCondition, setPriceCondition,
+    clearAllFilters,
+    hasActiveFilters
+  } = useTablePreferences();
+
+  const giftOptions = React.useMemo(() => {
+    if (!gifts) return [];
+    return [...gifts]
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+      .map(g => ({ label: g.name, value: g.id.toString() }));
+  }, [gifts]);
 
   const categories = React.useMemo(() => {
     if (!gifts) return [];
@@ -109,20 +126,81 @@ export default function AdminDashboard() {
     return Array.from(cats).sort();
   }, [gifts]);
 
+  const priceOptions = React.useMemo(() => {
+    if (!gifts) return [];
+    const prices = new Set(gifts.map(g => g.price));
+    return Array.from(prices)
+      .sort((a, b) => a - b)
+      .map(price => ({ label: formatCurrency(price), value: price.toString() }));
+  }, [gifts]);
+
   const filteredAndSortedGifts = React.useMemo(() => {
     if (!gifts) return [];
     let result = [...gifts];
 
-    if (statusFilter !== "all") {
-      if (statusFilter === "purchased") result = result.filter(g => g.isPurchased);
-      else if (statusFilter === "reserved") result = result.filter(g => g.isReserved && !g.isPurchased);
-      else if (statusFilter === "available") result = result.filter(g => !g.isReserved && !g.isPurchased);
-      else if (statusFilter === "hidden") result = result.filter(g => g.isActive === false);
-    }
+    const applyCondition = (value: string | undefined, condition: FilterCondition, isNumeric = false) => {
+      if (condition.type === 'none' || !condition.value) return true;
+      if (value === undefined || value === null) return false;
+      
+      if (isNumeric) {
+        const numValue = parseFloat(value);
+        const condValue = parseFloat(condition.value);
+        if (isNaN(numValue) || isNaN(condValue)) return true;
 
-    if (categoryFilter !== "all") {
-      result = result.filter(g => g.category === categoryFilter);
-    }
+        switch (condition.type) {
+          case 'equals': return numValue === condValue;
+          case 'greater_than': return numValue > condValue;
+          case 'less_than': return numValue < condValue;
+          case 'between': {
+            const condValue2 = parseFloat(condition.value2 || '');
+            if (isNaN(condValue2)) return numValue >= condValue;
+            return numValue >= condValue && numValue <= condValue2;
+          }
+          default: return true;
+        }
+      }
+
+      const valLower = value.toLowerCase();
+      const condLower = condition.value.toLowerCase();
+      switch (condition.type) {
+        case 'contains': return valLower.includes(condLower);
+        case 'not_contains': return !valLower.includes(condLower);
+        case 'starts_with': return valLower.startsWith(condLower);
+        case 'ends_with': return valLower.endsWith(condLower);
+        case 'equals': return valLower === condLower;
+        default: return true;
+      }
+    };
+
+    result = result.filter(g => {
+      let status = "available";
+      if (g.isActive === false) status = "hidden";
+      else if (g.isPurchased) status = "purchased";
+      else if (g.isReserved) status = "reserved";
+      
+      const passesCheckboxes = selectedStatuses.length === 0 || selectedStatuses.includes(status);
+      const passesCondition = applyCondition(status, statusCondition);
+      return passesCheckboxes && passesCondition;
+    });
+
+    result = result.filter(g => {
+      const cat = g.category || "";
+      const passesCheckboxes = selectedCategories.length === 0 || selectedCategories.includes(cat);
+      const passesCondition = applyCondition(cat, categoryCondition);
+      return passesCheckboxes && passesCondition;
+    });
+
+    result = result.filter(g => {
+      const passesCheckboxes = selectedGiftIds.length === 0 || selectedGiftIds.includes(g.id.toString());
+      const passesCondition = applyCondition(g.name, nameCondition);
+      return passesCheckboxes && passesCondition;
+    });
+
+    result = result.filter(g => {
+      const passesCheckboxes = selectedPrices.length === 0 || selectedPrices.includes(g.price.toString());
+      const passesCondition = applyCondition(g.price.toString(), priceCondition, true);
+      return passesCheckboxes && passesCondition;
+    });
 
     if (sortField) {
       result.sort((a, b) => {
@@ -141,7 +219,12 @@ export default function AdminDashboard() {
     }
 
     return result;
-  }, [gifts, statusFilter, categoryFilter, sortField, sortDirection]);
+  }, [
+    gifts, 
+    selectedStatuses, selectedCategories, selectedGiftIds, selectedPrices,
+    statusCondition, categoryCondition, nameCondition, priceCondition,
+    sortField, sortDirection
+  ]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -284,33 +367,18 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row justify-end gap-4">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filtrar por Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Status</SelectItem>
-              <SelectItem value="available">Disponível</SelectItem>
-              <SelectItem value="reserved">Reservado</SelectItem>
-              <SelectItem value="purchased">Comprado</SelectItem>
-              <SelectItem value="hidden">Oculto</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Filtrar por Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as Categorias</SelectItem>
-              {categories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Active Filters Clear Button */}
+        {hasActiveFilters && (
+          <div className="flex justify-end">
+            <Button 
+              variant="ghost" 
+              onClick={clearAllFilters}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Limpar todos os filtros
+            </Button>
+          </div>
+        )}
 
         {/* Table */}
         <div className="bg-card border border-border/50 overflow-hidden rounded-lg">
@@ -319,31 +387,82 @@ export default function AdminDashboard() {
               <TableHeader className="bg-muted/20">
                 <TableRow className="border-border/50">
                   <TableHead className="w-16"></TableHead>
-                  <TableHead className="font-serif">
-                    <div className="flex items-center">
-                      Presente
-                      <button onClick={() => handleSort('name')} className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
-                        {renderSortIcon('name')}
-                      </button>
-                    </div>
+                  <TableHead className="font-serif p-0">
+                    <DataTableFilter
+                      title="Presente"
+                      options={giftOptions}
+                      selectedValues={selectedGiftIds}
+                      onSelectedChange={setSelectedGiftIds}
+                      condition={nameCondition}
+                      onConditionChange={setNameCondition}
+                      sortDirection={sortField === 'name' ? sortDirection : null}
+                      onSortChange={(dir) => {
+                        if (dir) {
+                          setSortField('name');
+                          setSortDirection(dir);
+                        } else {
+                          setSortField(null);
+                          setSortDirection('asc');
+                        }
+                      }}
+                    />
                   </TableHead>
-                  <TableHead className="font-serif">
-                    <div className="flex items-center">
-                      Categoria
-                      <button onClick={() => handleSort('category')} className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
-                        {renderSortIcon('category')}
-                      </button>
-                    </div>
+                  <TableHead className="font-serif p-0">
+                    <DataTableFilter
+                      title="Categoria"
+                      options={categories.map(cat => ({ label: cat, value: cat }))}
+                      selectedValues={selectedCategories}
+                      onSelectedChange={setSelectedCategories}
+                      condition={categoryCondition}
+                      onConditionChange={setCategoryCondition}
+                      sortDirection={sortField === 'category' ? sortDirection : null}
+                      onSortChange={(dir) => {
+                        if (dir) {
+                          setSortField('category');
+                          setSortDirection(dir);
+                        } else {
+                          setSortField(null);
+                          setSortDirection('asc');
+                        }
+                      }}
+                    />
                   </TableHead>
-                  <TableHead className="font-serif">
-                    <div className="flex items-center justify-end">
-                      Valor
-                      <button onClick={() => handleSort('price')} className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none">
-                        {renderSortIcon('price')}
-                      </button>
-                    </div>
+                  <TableHead className="font-serif p-0 text-right">
+                    <DataTableFilter
+                      title="Valor"
+                      options={priceOptions}
+                      selectedValues={selectedPrices}
+                      onSelectedChange={setSelectedPrices}
+                      condition={priceCondition}
+                      onConditionChange={setPriceCondition}
+                      filterType="number"
+                      sortDirection={sortField === 'price' ? sortDirection : null}
+                      onSortChange={(dir) => {
+                        if (dir) {
+                          setSortField('price');
+                          setSortDirection(dir);
+                        } else {
+                          setSortField(null);
+                          setSortDirection('asc');
+                        }
+                      }}
+                    />
                   </TableHead>
-                  <TableHead className="font-serif">Status</TableHead>
+                  <TableHead className="font-serif p-0">
+                    <DataTableFilter
+                      title="Status"
+                      options={[
+                        { label: "Disponível", value: "available" },
+                        { label: "Reservado", value: "reserved" },
+                        { label: "Comprado", value: "purchased" },
+                        { label: "Oculto", value: "hidden" },
+                      ]}
+                      selectedValues={selectedStatuses}
+                      onSelectedChange={setSelectedStatuses}
+                      condition={statusCondition}
+                      onConditionChange={setStatusCondition}
+                    />
+                  </TableHead>
                   <TableHead className="font-serif">Reserva</TableHead>
                   <TableHead className="font-serif text-center">Link</TableHead>
                   <TableHead className="text-right font-serif">Ações</TableHead>
