@@ -40,6 +40,36 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+
+const getCategoryColor = (category: string) => {
+  if (!category) return "bg-secondary text-secondary-foreground border-transparent";
+  
+  const normalized = category.toLowerCase().trim();
+  
+  if (normalized.includes("cozinha")) return "bg-red-100 text-red-800 hover:bg-red-200/80 border-transparent";
+  if (normalized.includes("eletrodoméstico") || normalized.includes("eletrodomestico")) return "bg-blue-100 text-blue-800 hover:bg-blue-200/80 border-transparent";
+  
+  const pastelColors = [
+    "bg-emerald-100 text-emerald-800 hover:bg-emerald-200/80 border-transparent",
+    "bg-amber-100 text-amber-800 hover:bg-amber-200/80 border-transparent",
+    "bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200/80 border-transparent",
+    "bg-rose-100 text-rose-800 hover:bg-rose-200/80 border-transparent",
+    "bg-indigo-100 text-indigo-800 hover:bg-indigo-200/80 border-transparent",
+    "bg-teal-100 text-teal-800 hover:bg-teal-200/80 border-transparent",
+    "bg-orange-100 text-orange-800 hover:bg-orange-200/80 border-transparent",
+    "bg-cyan-100 text-cyan-800 hover:bg-cyan-200/80 border-transparent",
+    "bg-lime-100 text-lime-800 hover:bg-lime-200/80 border-transparent",
+    "bg-violet-100 text-violet-800 hover:bg-violet-200/80 border-transparent",
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = normalized.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  hash = Math.abs(hash);
+  return pastelColors[hash % pastelColors.length];
+};
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -358,7 +388,9 @@ export default function AdminDashboard() {
                       </TableCell>
                       <TableCell>
                         {gift.category && (
-                          <Badge variant="secondary" className="font-normal text-xs">{gift.category}</Badge>
+                          <Badge className={cn("font-normal text-xs", getCategoryColor(gift.category))}>
+                            {gift.category}
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell className="text-right">{formatCurrency(gift.price)}</TableCell>
