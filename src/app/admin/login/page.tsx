@@ -16,12 +16,7 @@ export default function AdminLogin() {
   
   const verifyAdmin = useVerifyAdmin();
 
-  // Check if already authenticated
-  useEffect(() => {
-    if (sessionStorage.getItem("adminAuth") === "true") {
-      router.push("/admin");
-    }
-  }, [router]);
+  // Check if already authenticated (now handled by middleware)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +29,6 @@ export default function AdminLogin() {
       onSuccess: (data) => {
         setIsLoading(false);
         if (data.success) {
-          sessionStorage.setItem("adminAuth", "true");
           router.push("/admin");
         } else {
           toast.error("Acesso negado", {

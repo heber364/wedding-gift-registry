@@ -9,3 +9,10 @@ export function useVerifyAdmin(options?: UseMutationOptions<{ success: boolean }
     ...options,
   });
 }
+
+export function useLogoutAdmin(options?: UseMutationOptions<{ success: boolean }, unknown, void>) {
+  return useMutation({
+    mutationFn: () => adminApi.logoutAdmin(),
+    ...options,
+  });
+}
