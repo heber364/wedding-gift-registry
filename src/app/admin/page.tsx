@@ -35,11 +35,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown, BarChart2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ReservationModal } from "@/components/ReservationModal";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const getCategoryColor = (category: string) => {
@@ -240,6 +241,15 @@ export default function AdminDashboard() {
             <p className="text-muted-foreground mt-1">Gerencie a lista de presentes e reservas.</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin/metrics">
+              <Button 
+                variant="outline" 
+                className="border-border text-foreground hover:bg-muted font-serif"
+              >
+                <BarChart2 className="w-4 h-4 mr-2" />
+                Métricas
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               onClick={handleLogout}
