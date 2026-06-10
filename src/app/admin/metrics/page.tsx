@@ -1,17 +1,48 @@
 "use client";
 
-import React, { useMemo, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { customFetch } from "@/services/api/client";
+import React, { useMemo } from "react";
+import { useGiftsMetrics } from "@/hooks/useGiftsMetrics";
 import { formatCurrency } from "@/lib/formatters";
-import type { Gift } from "@/hooks/useGifts";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Wallet, CreditCard, PieChart as PieChartIcon } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  ArrowLeft,
+  Wallet,
+  CreditCard,
+  PieChart as PieChartIcon,
+  Gift,
+  ShoppingBag,
+  LayoutList,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Area, AreaChart, Cell } from "recharts";
-import { useRouter } from "next/navigation";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Pie,
+  PieChart,
+  Area,
+  AreaChart,
+  Cell,
+} from "recharts";
+
+// ─── Chart configs ─────────────────────────────────────────────────────────────
 
 const statusConfig = {
   disponivel: { label: "Disponível", color: "hsl(var(--muted-foreground))" },
@@ -19,93 +50,101 @@ const statusConfig = {
   comprado: { label: "Comprado", color: "hsl(var(--chart-2))" },
 };
 
-const categoryConfig = {
-  count: { label: "Quantidade", color: "hsl(var(--chart-1))" },
-  value: { label: "Valor", color: "hsl(var(--chart-3))" },
+const categoryCountConfig = {
+  itensDisponiveis: { label: "Disponíveis", color: "hsl(var(--muted-foreground))" },
+  itensReservados: { label: "Reservados", color: "hsl(var(--primary))" },
+  itensComprados: { label: "Comprados", color: "hsl(var(--chart-2))" },
+};
+
+const categoryValueConfig = {
+  valorTotal: { label: "Valor Total", color: "hsl(var(--muted-foreground))" },
+  valorAdotado: { label: "Valor Adotado", color: "hsl(var(--chart-1))" },
 };
 
 const timeConfig = {
   count: { label: "Reservas", color: "hsl(var(--chart-4))" },
 };
 
+// ─── KPI Card ──────────────────────────────────────────────────────────────────
+
+interface KpiCardProps {
+  title: string;
+  value: string;
+  description: string;
+  icon: React.ReactNode;
+  highlight?: boolean;
+}
+
+function KpiCard({ title, value, description, icon, highlight }: KpiCardProps) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <span className="h-4 w-4 text-muted-foreground">{icon}</span>
+      </CardHeader>
+      <CardContent>
+        <div
+          className={`text-2xl font-bold font-serif ${highlight ? "text-primary" : ""
+            }`}
+        >
+          {value}
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
 export default function MetricsDashboard() {
-  const { data: gifts, isLoading } = useQuery({
-    queryKey: ["admin-gifts"],
-    queryFn: () => customFetch<Gift[]>("/api/gifts/admin"),
-  });
-
-  const kpis = useMemo(() => {
-    if (!gifts) return { totalReservado: 0, totalComprado: 0, taxaAdocao: 0 };
-    let reservedVal = 0;
-    let purchasedVal = 0;
-    let adoptedCount = 0;
-
-    gifts.forEach(g => {
-      if (g.isPurchased) {
-        purchasedVal += Number(g.price);
-        adoptedCount++;
-      } else if (g.isReserved) {
-        reservedVal += Number(g.price);
-        adoptedCount++;
-      }
-    });
-
-    return {
-      totalReservado: reservedVal,
-      totalComprado: purchasedVal,
-      taxaAdocao: gifts.length > 0 ? (adoptedCount / gifts.length) * 100 : 0
-    };
-  }, [gifts]);
+  const { data: metrics, isLoading } = useGiftsMetrics();
 
   const statusData = useMemo(() => {
-    if (!gifts) return [];
-    let d = 0, r = 0, c = 0;
-    gifts.forEach(g => {
-      if (g.isPurchased) c++;
-      else if (g.isReserved) r++;
-      else d++;
-    });
+    if (!metrics) return [];
     return [
-      { status: "Disponível", count: d, fill: "var(--color-disponivel)" },
-      { status: "Reservado", count: r, fill: "var(--color-reservado)" },
-      { status: "Comprado", count: c, fill: "var(--color-comprado)" },
+      {
+        status: "Disponível",
+        count: metrics.totalAvailable,
+        fill: "var(--color-disponivel)",
+      },
+      {
+        status: "Reservado",
+        count: metrics.totalReserved,
+        fill: "var(--color-reservado)",
+      },
+      {
+        status: "Comprado",
+        count: metrics.totalPurchased,
+        fill: "var(--color-comprado)",
+      },
     ];
-  }, [gifts]);
+  }, [metrics]);
 
+  // Truncate long category names for chart axis
   const categoryData = useMemo(() => {
-    if (!gifts) return [];
-    const catMap = new Map<string, { count: number; value: number }>();
-    gifts.forEach(g => {
-      if (g.isPurchased || g.isReserved) {
-        const cat = g.category || "Sem Categoria";
-        const current = catMap.get(cat) || { count: 0, value: 0 };
-        current.count += 1;
-        current.value += Number(g.price);
-        catMap.set(cat, current);
-      }
-    });
-    return Array.from(catMap.entries()).map(([category, stats]) => ({
-      category,
-      count: stats.count,
-      value: stats.value,
-    })).sort((a, b) => b.value - a.value);
-  }, [gifts]);
-
-  const timeData = useMemo(() => {
-    if (!gifts) return [];
-    const dates = new Map<string, number>();
-    gifts.forEach(g => {
-      if ((g.isReserved || g.isPurchased) && g.reservedAt) {
-        const dateStr = new Date(g.reservedAt).toLocaleDateString('pt-BR');
-        dates.set(dateStr, (dates.get(dateStr) || 0) + 1);
-      }
-    });
-    return Array.from(dates.entries())
-      .map(([date, count]) => ({ date, count }));
-  }, [gifts]);
+    if (!metrics) return [];
+    return metrics.categories.map((c) => ({
+      ...c,
+      categoryLabel:
+        c.category.length > 12 ? c.category.slice(0, 12) + "…" : c.category,
+    }));
+  }, [metrics]);
 
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">Carregando métricas...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Carregando métricas...
+      </div>
+    );
+  }
+
+  if (!metrics) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+        Nenhum dado disponível.
+      </div>
+    );
   }
 
   return (
@@ -121,46 +160,69 @@ export default function MetricsDashboard() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-serif font-normal">Métricas e Dashboard</h1>
-              <p className="text-muted-foreground mt-1">Acompanhe o desempenho da sua lista de presentes.</p>
+              <h1 className="text-3xl font-serif font-normal">
+                Métricas e Dashboard
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Acompanhe o desempenho da sua lista de presentes.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Valor Total Reservado</CardTitle>
-              <Wallet className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-serif">{formatCurrency(kpis.totalReservado)}</div>
-              <p className="text-xs text-muted-foreground mt-1">Aguardando confirmação ou compra</p>
-            </CardContent>
-          </Card>
+        {/* KPIs — row 1: visão geral da lista */}
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Visão Geral da Lista
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <KpiCard
+              title="Total Cadastrado"
+              value={String(metrics.totalRegistered)}
+              description="Presentes ativos na lista"
+              icon={<LayoutList className="h-4 w-4" />}
+            />
+            <KpiCard
+              title="Disponíveis"
+              value={String(metrics.totalAvailable)}
+              description="Aguardando um padrinho"
+              icon={<Gift className="h-4 w-4" />}
+            />
+            <KpiCard
+              title="Valor Total da Lista"
+              value={formatCurrency(metrics.totalListValue)}
+              description="Soma de todos os presentes ativos"
+              icon={<Wallet className="h-4 w-4" />}
+            />
+          </div>
+        </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Valor Total Comprado</CardTitle>
-              <CreditCard className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-serif text-primary">{formatCurrency(kpis.totalComprado)}</div>
-              <p className="text-xs text-muted-foreground mt-1">Presentes já garantidos</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa de Adoção</CardTitle>
-              <PieChartIcon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-serif">{kpis.taxaAdocao.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground mt-1">Dos presentes foram escolhidos</p>
-            </CardContent>
-          </Card>
+        {/* KPIs — row 2: adoção */}
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Adoção e Arrecadação
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <KpiCard
+              title="Valor Total Reservado"
+              value={formatCurrency(metrics.reservedValue)}
+              description="Aguardando confirmação ou compra"
+              icon={<ShoppingBag className="h-4 w-4" />}
+            />
+            <KpiCard
+              title="Valor Total Comprado"
+              value={formatCurrency(metrics.purchasedValue)}
+              description="Presentes já garantidos"
+              icon={<CreditCard className="h-4 w-4" />}
+              highlight
+            />
+            <KpiCard
+              title="Taxa de Adoção"
+              value={`${metrics.adoptionRate.toFixed(1)}%`}
+              description="Dos presentes foram escolhidos"
+              icon={<PieChartIcon className="h-4 w-4" />}
+            />
+          </div>
         </div>
 
         {/* Charts */}
@@ -170,13 +232,27 @@ export default function MetricsDashboard() {
           <Card className="flex flex-col">
             <CardHeader>
               <CardTitle>Status da Lista</CardTitle>
-              <CardDescription>Proporção de presentes disponíveis, reservados e comprados.</CardDescription>
+              <CardDescription>
+                Proporção de presentes disponíveis, reservados e comprados.
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex pb-0">
-              <ChartContainer config={statusConfig} className="mx-auto aspect-square max-h-[300px] pb-4">
+              <ChartContainer
+                config={statusConfig}
+                className="mx-auto aspect-square max-h-[300px] pb-4"
+              >
                 <PieChart>
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                  <Pie data={statusData} dataKey="count" nameKey="status" innerRadius={60} strokeWidth={5}>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={statusData}
+                    dataKey="count"
+                    nameKey="status"
+                    innerRadius={60}
+                    strokeWidth={5}
+                  >
                     {statusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
@@ -190,21 +266,50 @@ export default function MetricsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Evolução de Reservas</CardTitle>
-              <CardDescription>Quantidade de reservas feitas por dia.</CardDescription>
+              <CardDescription>
+                Quantidade de reservas feitas por dia.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={timeConfig} className="aspect-auto h-[250px]">
-                <AreaChart data={timeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <ChartContainer
+                config={timeConfig}
+                className="aspect-auto h-[250px]"
+              >
+                <AreaChart
+                  data={metrics.reservationsByDay}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="fillCount" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-count)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="var(--color-count)" stopOpacity={0.1} />
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-count)"
+                        stopOpacity={0.8}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-count)"
+                        stopOpacity={0.1}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} />
-                  <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    allowDecimals={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="line" />}
+                  />
                   <Area
                     dataKey="count"
                     type="monotone"
@@ -217,41 +322,93 @@ export default function MetricsDashboard() {
             </CardContent>
           </Card>
 
-          {/* Categories Count Bar */}
+          {/* Category Stacked Bar — all items */}
           <Card>
             <CardHeader>
               <CardTitle>Presentes por Categoria</CardTitle>
-              <CardDescription>Quantidade de itens escolhidos em cada área.</CardDescription>
+              <CardDescription>
+                Todos os itens cadastrados, separados por status.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={categoryConfig} className="aspect-auto h-[250px]">
-                <BarChart data={categoryData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <ChartContainer
+                config={categoryCountConfig}
+                className="aspect-auto h-[280px]"
+              >
+                <BarChart
+                  data={categoryData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid vertical={false} />
-                  <XAxis dataKey="category" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                  <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                  <XAxis
+                    dataKey="categoryLabel"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    allowDecimals={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar
+                    dataKey="availableItems"
+                    stackId="a"
+                    fill="var(--color-itensDisponiveis)"
+                    radius={[0, 0, 4, 4]}
+                  />
+                  <Bar
+                    dataKey="reservedItems"
+                    stackId="a"
+                    fill="var(--color-itensReservados)"
+                    radius={[0, 0, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="purchasedItems"
+                    stackId="a"
+                    fill="var(--color-itensComprados)"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ChartContainer>
             </CardContent>
           </Card>
 
-          {/* Categories Value Bar */}
+          {/* Category Value Grouped Bar — total vs adopted */}
           <Card>
             <CardHeader>
-              <CardTitle>Valor Arrecadado por Categoria</CardTitle>
-              <CardDescription>Total financeiro (R$) escolhido por área.</CardDescription>
+              <CardTitle>Valor Total vs. Adotado por Categoria</CardTitle>
+              <CardDescription>
+                Potencial total (R$) de cada categoria versus o já adotado.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={categoryConfig} className="aspect-auto h-[250px]">
-                <BarChart data={categoryData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <ChartContainer
+                config={categoryValueConfig}
+                className="aspect-auto h-[280px]"
+              >
+                <BarChart
+                  data={categoryData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid vertical={false} />
-                  <XAxis dataKey="category" tickLine={false} axisLine={false} tickMargin={8} />
+                  <XAxis
+                    dataKey="categoryLabel"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
                     tickMargin={8}
-                    tickFormatter={(value) => `R$ ${value}`}
+                    tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
                   />
                   <ChartTooltip
                     cursor={false}
@@ -262,13 +419,76 @@ export default function MetricsDashboard() {
                       />
                     }
                   />
-                  <Bar dataKey="value" fill="var(--color-value)" radius={4} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar
+                    dataKey="totalValue"
+                    fill="var(--color-valorTotal)"
+                    radius={4}
+                  />
+                  <Bar
+                    dataKey="adoptedValue"
+                    fill="var(--color-valorAdotado)"
+                    radius={4}
+                  />
                 </BarChart>
               </ChartContainer>
             </CardContent>
           </Card>
 
         </div>
+
+        {/* Progress por Categoria */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Progresso de Adoção por Categoria</CardTitle>
+            <CardDescription>
+              Percentual de itens já escolhidos (reservados + comprados) em cada
+              categoria.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-5">
+              {metrics.categories.map((cat) => {
+                const adoptedCount = cat.reservedItems + cat.purchasedItems;
+                const pct =
+                  cat.totalItems > 0
+                    ? Math.round((adoptedCount / cat.totalItems) * 100)
+                    : 0;
+                return (
+                  <div key={cat.category}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {cat.category}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          ({adoptedCount}/{cat.totalItems} itens)
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold tabular-nums">
+                        {pct}%
+                      </span>
+                    </div>
+                    <Progress value={pct} className="h-2" />
+                    <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+                      <span>
+                        {cat.reservedItems} reservado
+                        {cat.reservedItems !== 1 ? "s" : ""} ·{" "}
+                        {cat.purchasedItems} comprado
+                        {cat.purchasedItems !== 1 ? "s" : ""}
+                      </span>
+                      <span>
+                        {formatCurrency(cat.adoptedValue)} /{" "}
+                        {formatCurrency(cat.totalValue)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
       </div>
     </div>
   );
