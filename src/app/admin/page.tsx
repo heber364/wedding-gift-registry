@@ -43,24 +43,21 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const getCategoryColor = (category: string) => {
-  if (!category) return "bg-secondary text-secondary-foreground border-transparent";
+  if (!category) return "bg-secondary/10 text-secondary-foreground border-border/50";
   
   const normalized = category.toLowerCase().trim();
   
-  if (normalized.includes("cozinha")) return "bg-red-100 text-red-800 hover:bg-red-200/80 border-transparent";
-  if (normalized.includes("eletrodoméstico") || normalized.includes("eletrodomestico")) return "bg-blue-100 text-blue-800 hover:bg-blue-200/80 border-transparent";
-  
   const pastelColors = [
-    "bg-emerald-100 text-emerald-800 hover:bg-emerald-200/80 border-transparent",
-    "bg-amber-100 text-amber-800 hover:bg-amber-200/80 border-transparent",
-    "bg-fuchsia-100 text-fuchsia-800 hover:bg-fuchsia-200/80 border-transparent",
-    "bg-rose-100 text-rose-800 hover:bg-rose-200/80 border-transparent",
-    "bg-indigo-100 text-indigo-800 hover:bg-indigo-200/80 border-transparent",
-    "bg-teal-100 text-teal-800 hover:bg-teal-200/80 border-transparent",
-    "bg-orange-100 text-orange-800 hover:bg-orange-200/80 border-transparent",
-    "bg-cyan-100 text-cyan-800 hover:bg-cyan-200/80 border-transparent",
-    "bg-lime-100 text-lime-800 hover:bg-lime-200/80 border-transparent",
-    "bg-violet-100 text-violet-800 hover:bg-violet-200/80 border-transparent",
+    "bg-orange-500/10 text-orange-500 border-orange-500/20",
+    "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    "bg-teal-500/10 text-teal-500 border-teal-500/20",
+    "bg-cyan-500/10 text-cyan-500 border-cyan-500/20",
+    "bg-indigo-500/10 text-indigo-500 border-indigo-500/20",
+    "bg-violet-500/10 text-violet-500 border-violet-500/20",
+    "bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20",
+    "bg-pink-500/10 text-pink-500 border-pink-500/20",
+    "bg-rose-500/10 text-rose-500 border-rose-500/20",
   ];
 
   let hash = 0;
@@ -388,7 +385,7 @@ export default function AdminDashboard() {
                       </TableCell>
                       <TableCell>
                         {gift.category && (
-                          <Badge className={cn("font-normal text-xs", getCategoryColor(gift.category))}>
+                          <Badge variant="outline" className={cn("font-normal text-xs", getCategoryColor(gift.category))}>
                             {gift.category}
                           </Badge>
                         )}
