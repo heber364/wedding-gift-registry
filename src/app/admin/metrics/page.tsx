@@ -29,14 +29,6 @@ const timeConfig = {
 };
 
 export default function MetricsDashboard() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!sessionStorage.getItem("adminAuth")) {
-      router.push("/admin/login");
-    }
-  }, [router]);
-
   const { data: gifts, isLoading } = useQuery({
     queryKey: ["admin-gifts"],
     queryFn: () => customFetch<Gift[]>("/api/gifts/admin"),
@@ -47,7 +39,7 @@ export default function MetricsDashboard() {
     let reservedVal = 0;
     let purchasedVal = 0;
     let adoptedCount = 0;
-    
+
     gifts.forEach(g => {
       if (g.isPurchased) {
         purchasedVal += Number(g.price);
@@ -119,7 +111,7 @@ export default function MetricsDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border pb-6">
           <div className="flex items-center gap-4">
@@ -147,7 +139,7 @@ export default function MetricsDashboard() {
               <p className="text-xs text-muted-foreground mt-1">Aguardando confirmação ou compra</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Valor Total Comprado</CardTitle>
@@ -173,7 +165,7 @@ export default function MetricsDashboard() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           {/* Status Donut */}
           <Card className="flex flex-col">
             <CardHeader>
@@ -255,20 +247,20 @@ export default function MetricsDashboard() {
                 <BarChart data={categoryData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <CartesianGrid vertical={false} />
                   <XAxis dataKey="category" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis 
-                    tickLine={false} 
-                    axisLine={false} 
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
                     tickMargin={8}
                     tickFormatter={(value) => `R$ ${value}`}
                   />
-                  <ChartTooltip 
-                    cursor={false} 
+                  <ChartTooltip
+                    cursor={false}
                     content={
-                      <ChartTooltipContent 
-                        hideLabel 
+                      <ChartTooltipContent
+                        hideLabel
                         formatter={(value) => formatCurrency(Number(value))}
                       />
-                    } 
+                    }
                   />
                   <Bar dataKey="value" fill="var(--color-value)" radius={4} />
                 </BarChart>

@@ -9,6 +9,7 @@ import {
   getListGiftsQueryKey,
   getGetGiftsSummaryQueryKey
 } from "@/hooks/useGifts";
+import { useLogoutAdmin } from "@/hooks/useAdmin";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "@/services/api/client";
 import { formatCurrency, formatDate } from "@/lib/formatters";
@@ -88,6 +89,7 @@ export default function AdminDashboard() {
   const deleteGift = useDeleteGift();
   const unreserveGift = useUnreserveGift();
   const updateGift = useUpdateGift();
+  const logoutAdmin = useLogoutAdmin();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingGift, setEditingGift] = useState<Gift | null>(null);
@@ -180,16 +182,12 @@ export default function AdminDashboard() {
     );
   };
 
-  useEffect(() => {
-    // Check if authenticated
-    if (!sessionStorage.getItem("adminAuth")) {
-      router.push("/admin/login");
-    }
-  }, [router]);
-
   const handleLogout = () => {
-    sessionStorage.removeItem("adminAuth");
-    router.push("/admin/login");
+    logoutAdmin.mutate(undefined, {
+      onSettled: () => {
+        router.push("/admin/login");
+      }
+    });
   };
 
   const handleEdit = (gift: Gift) => {
