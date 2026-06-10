@@ -23,6 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,10 +55,14 @@ interface AdminGiftFormProps {
   onClose: () => void;
   gift: Gift | null;
   isDuplicate?: boolean;
+  categories?: string[];
 }
 
-export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftFormProps) {
+export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate, categories = [] }: AdminGiftFormProps) {
   const queryClient = useQueryClient();
+
+  const [comboboxOpen, setComboboxOpen] = React.useState(false);
+  const [comboboxInput, setComboboxInput] = React.useState("");
 
   const createGift = useCreateGift();
   const updateGift = useUpdateGift();
@@ -199,11 +207,85 @@ export function AdminGiftForm({ isOpen, onClose, gift, isDuplicate }: AdminGiftF
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col pt-[6px]">
                     <FormLabel>Categoria (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} className="bg-background/50 border-border" placeholder="Ex: Viagem, Cozinha" />
-                    </FormControl>
+                    <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={comboboxOpen}
+                            className={cn(
+                              "w-full justify-between bg-background/50 border-border font-normal px-3",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "Ex: Viagem, Cozinha"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <Command>
+                          <CommandInput 
+                            placeholder="Buscar ou adicionar..." 
+                            onValueChange={setComboboxInput}
+                            value={comboboxInput}
+                          />
+                          <CommandList>
+                            <CommandEmpty>
+                              {comboboxInput.trim().length > 0 ? (
+                                <div 
+                                  className="p-2 cursor-pointer text-sm text-primary hover:bg-muted"
+                                  onClick={() => {
+                                    form.setValue("category", comboboxInput.trim());
+                                    setComboboxOpen(false);
+                                    setComboboxInput("");
+                                  }}
+                                >
+                                  Criar "{comboboxInput.trim()}"
+                                </div>
+                              ) : "Nenhuma encontrada."}
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {categories?.map((cat) => (
+                                <CommandItem
+                                  key={cat}
+                                  value={cat}
+                                  onSelect={() => {
+                                    form.setValue("category", cat);
+                                    setComboboxOpen(false);
+                                    setComboboxInput("");
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === cat ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {cat}
+                                </CommandItem>
+                              ))}
+                              {comboboxInput.trim().length > 0 && !categories?.includes(comboboxInput.trim()) && (
+                                <CommandItem
+                                  value={comboboxInput.trim()}
+                                  onSelect={() => {
+                                    form.setValue("category", comboboxInput.trim());
+                                    setComboboxOpen(false);
+                                    setComboboxInput("");
+                                  }}
+                                >
+                                  <Plus className="mr-2 h-4 w-4" />
+                                  Criar "{comboboxInput.trim()}"
+                                </CommandItem>
+                              )}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
