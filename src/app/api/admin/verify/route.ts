@@ -24,7 +24,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+    
+    response.cookies.set({
+      name: 'adminAuth',
+      value: 'true',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 // 1 day
+    });
+
+    return response;
   } catch (error) {
     console.error("Admin verify Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

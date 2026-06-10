@@ -8,4 +8,8 @@ export const adminApi = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  logoutAdmin: () =>
+    customFetch<{ success: boolean }>("/api/admin/logout", {
+      method: "POST",
+    }),
 };
