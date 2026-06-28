@@ -12,6 +12,8 @@ import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import type { Gift } from "@/hooks/useGifts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FreeValueGiftCard } from "@/components/FreeValueGiftCard";
+import { FreeValueModal } from "@/components/FreeValueModal";
 import {
   Select,
   SelectContent,
@@ -41,6 +43,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortOption, setSortOption] = useState<SortOption>("default");
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [showFreeValueModal, setShowFreeValueModal] = useState<boolean>(false);
 
   const categories = useMemo(() => {
     if (!gifts) return [];
@@ -260,6 +263,7 @@ export default function Home() {
           </div>
         ) : filteredGifts.length ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <FreeValueGiftCard onClick={() => setShowFreeValueModal(true)} />
             {filteredGifts.map((gift) => (
               <GiftCard
                 key={gift.id}
@@ -290,6 +294,10 @@ export default function Home() {
         gift={selectedGift}
         isOpen={!!selectedGift}
         onClose={() => setSelectedGift(null)}
+      />
+      <FreeValueModal
+        isOpen={showFreeValueModal}
+        onClose={() => setShowFreeValueModal(false)}
       />
     </div>
   );
