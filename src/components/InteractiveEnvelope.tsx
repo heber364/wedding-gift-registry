@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const kraftTexture = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E")`;
-const cottonTexture = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`;
 
 export function InteractiveEnvelope() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,19 +33,21 @@ export function InteractiveEnvelope() {
     };
   }, [isVisible, isMounted]);
 
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        sessionStorage.setItem("hasSeenInvitation", "true");
+      }, 1000); // Espera 1s para a aba abrir antes de começar a desaparecer
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   const handleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isOpen) return;
     setIsOpen(true);
     setIsBroken(true);
-  };
-
-  const handleClose = () => {
-    if (!isOpen) return;
-
-
-    setIsVisible(false);
-    sessionStorage.setItem("hasSeenInvitation", "true");
   };
 
   if (!isMounted) {
@@ -63,11 +64,10 @@ export function InteractiveEnvelope() {
       {isVisible && (
         <motion.div
           className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md overflow-hidden perspective-[1200px]"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          onClick={handleClose}
+          initial={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 1.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
         >
           <div className="relative w-[90vw] max-w-[800px] aspect-[4/3] md:aspect-[16/9] mx-auto flex items-center justify-center">
 
@@ -76,22 +76,6 @@ export function InteractiveEnvelope() {
               className="absolute inset-0 bg-[#4a131c] shadow-2xl rounded-sm"
               style={{ backgroundImage: kraftTexture }}
             />
-
-            {/* Cartão de Algodão Interno */}
-            <motion.div
-              className="absolute w-[90%] h-[85%] bottom-2 bg-[#fdfbf7] shadow-inner rounded-sm p-6 md:p-12 flex flex-col items-center justify-center text-center border border-border/20 z-[3]"
-              style={{ backgroundImage: cottonTexture }}
-              initial={{ y: "0%" }}
-              animate={{ y: isOpen ? "-60%" : "0%" }} // Sobe mais usando porcentagem relativa à sua própria altura
-              transition={{ duration: 3, delay: isOpen ? 0.8 : 0, ease: [0.25, 1, 0.5, 1] }} // Se abriu, atrasa 0.8s. Se fechou, desce primeiro (delay 0)
-            >
-              <h2 className="font-serif text-2xl md:text-5xl text-[#3b1016] mb-4">Vocês são nossos convidados de honra!</h2>
-              <p className="text-muted-foreground font-light tracking-wide max-w-md mx-auto text-xs md:text-base leading-relaxed">
-                Nossa maior alegria é celebrar este momento inesquecível ao lado de quem amamos.
-                Preparamos esta lista com muito carinho e agradecemos desde já por todo o amor.
-              </p>
-              <p className="mt-8 font-serif italic text-primary text-lg md:text-xl">Com carinho, Helloisa & Héber</p>
-            </motion.div>
 
             {/* Abas Frontais (Esquerda, Direita e Base) */}
             <div
@@ -116,8 +100,8 @@ export function InteractiveEnvelope() {
                 zIndex: isOpen ? 1 : 4
               }}
               transition={{
-                rotateX: { duration: 1, delay: isOpen ? 0 : 3, ease: "easeInOut" },
-                zIndex: { duration: 0, delay: isOpen ? 0.8 : 3 }
+                rotateX: { duration: 1, delay: isOpen ? 0 : 0, ease: "easeInOut" },
+                zIndex: { duration: 0, delay: isOpen ? 0.8 : 0 }
               }}
             >
               {/* Desenho da Aba com clipPath (isolado para não cortar o lacre) */}
