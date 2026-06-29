@@ -38,7 +38,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown, BarChart2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Unlock, LogOut, Copy, Eye, EyeOff, CreditCard, MoreHorizontal, ExternalLink, Image as ImageIcon, ArrowUpDown, ArrowUp, ArrowDown, BarChart2, MessageCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ReservationModal } from "@/components/ReservationModal";
@@ -311,6 +311,48 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleWhatsAppExport = async (includeLinks: boolean = false) => {
+    if (!filteredAndSortedGifts.length) {
+      toast.error("Nenhum presente disponível na lista para exportar.");
+      return;
+    }
+
+    const giftsByCategory = filteredAndSortedGifts.reduce((acc, gift) => {
+      const cat = gift.category || "Outros";
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(gift);
+      return acc;
+    }, {} as Record<string, Gift[]>);
+
+    let text = "🎁 *Nossa Lista de Presentes* 🎁\n\n";
+
+    for (const [cat, items] of Object.entries(giftsByCategory)) {
+      text += `*${cat}*\n`;
+      items.forEach(gift => {
+        const isUnavailable = gift.isReserved || gift.isPurchased || gift.isActive === false;
+        
+        const nameFormat = isUnavailable ? `~*${gift.name}*~` : `*${gift.name}*`;
+        const priceText = formatCurrency(gift.price);
+        
+        text += `• ${nameFormat} - ${priceText}\n`;
+        
+        if (includeLinks) {
+          const link = gift.productLink || `${window.location.origin}/?buscar=${encodeURIComponent(gift.name)}`;
+          text += `  ${link}\n`;
+        }
+      });
+      text += "\n";
+    }
+
+    try {
+      await navigator.clipboard.writeText(text.trim());
+      toast.success("Lista copiada para o WhatsApp!");
+    } catch (err) {
+      console.error("Failed to copy", err);
+      toast.error("Erro ao copiar a lista.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -367,9 +409,28 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Active Filters Clear Button */}
-        {hasActiveFilters && (
-          <div className="flex justify-end">
+        {/* Actions above table */}
+        <div className="flex justify-end items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="border-green-500/30 text-green-600 hover:bg-green-500/10 hover:text-green-700 dark:text-green-500 font-serif"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Copiar Lista (WhatsApp)
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleWhatsAppExport(false)} className="cursor-pointer">
+                Sem links (Compacto)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleWhatsAppExport(true)} className="cursor-pointer">
+                Com links (Detalhado)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {hasActiveFilters && (
             <Button 
               variant="ghost" 
               onClick={clearAllFilters}
@@ -377,8 +438,8 @@ export default function AdminDashboard() {
             >
               Limpar todos os filtros
             </Button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Table */}
         <div className="bg-card border border-border/50 overflow-hidden rounded-lg">
