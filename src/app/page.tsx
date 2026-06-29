@@ -284,8 +284,8 @@ export default function Home() {
         <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
         <div className="text-sm max-w-sm px-4">
           <p className="font-medium text-foreground">Endereço para entrega de presentes físicos:</p>
-          <p>Condomínio Montserrat 3, Número 1250</p>
-          <p>CEP: 45097-400</p>
+          <p>R. Júlio José de Oliveira, 1250 - Colina Verde</p>
+          <p>CEP: 45987-400</p>
         </div>
       </footer>
 

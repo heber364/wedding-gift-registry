@@ -451,8 +451,8 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                           </Button>
                           <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
                             <strong>Endereço para entrega:</strong><br />
-                            Condomínio Montserrat 3, Número 1250<br />
-                            CEP: 45097-400
+                            R. Júlio José de Oliveira, 1250 - Colina Verde<br />
+                            CEP: 45987-400
                           </p>
                         </div>
                       )}
@@ -616,8 +616,8 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     </Button>
                     <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
                       <strong>Endereço para entrega:</strong><br />
-                      Condomínio Montserrat 3, Número 1250<br />
-                      CEP: 45097-400
+                      R. Júlio José de Oliveira, 1250 - Colina Verde<br />
+                      CEP: 45987-400
                     </p>
                   </div>
                 )}
