@@ -11,6 +11,7 @@ import { ReservationModal } from "@/components/ReservationModal";
 import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import type { Gift } from "@/hooks/useGifts";
+import { sortGifts } from "@/lib/sortGifts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FreeValueGiftCard } from "@/components/FreeValueGiftCard";
 import { FreeValueModal } from "@/components/FreeValueModal";
@@ -73,11 +74,7 @@ export default function Home() {
       );
     }
 
-    if (sortOption === "price-asc") {
-      result = [...result].sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-desc") {
-      result = [...result].sort((a, b) => b.price - a.price);
-    }
+    result = sortGifts(result, sortOption);
 
     return result;
   }, [gifts, activeCategory, activeFilter, searchQuery, sortOption]);
