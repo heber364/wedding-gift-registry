@@ -11,6 +11,7 @@ import { ReservationModal } from "@/components/ReservationModal";
 import { InteractiveEnvelope } from "@/components/InteractiveEnvelope";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import type { Gift } from "@/hooks/useGifts";
+import { sortGifts } from "@/lib/sortGifts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FreeValueGiftCard } from "@/components/FreeValueGiftCard";
 import { FreeValueModal } from "@/components/FreeValueModal";
@@ -73,11 +74,7 @@ export default function Home() {
       );
     }
 
-    if (sortOption === "price-asc") {
-      result = [...result].sort((a, b) => a.price - b.price);
-    } else if (sortOption === "price-desc") {
-      result = [...result].sort((a, b) => b.price - a.price);
-    }
+    result = sortGifts(result, sortOption);
 
     return result;
   }, [gifts, activeCategory, activeFilter, searchQuery, sortOption]);
@@ -284,8 +281,8 @@ export default function Home() {
         <p className="font-serif italic text-lg text-primary">Com amor, Helloisa &amp; Héber</p>
         <div className="text-sm max-w-sm px-4">
           <p className="font-medium text-foreground">Endereço para entrega de presentes físicos:</p>
-          <p>Condomínio Montserrat 3, Número 1250</p>
-          <p>CEP: 45097-400</p>
+          <p>R. Júlio José de Oliveira, 1250 - Colina Verde</p>
+          <p>CEP: 45987-400</p>
         </div>
       </footer>
 
