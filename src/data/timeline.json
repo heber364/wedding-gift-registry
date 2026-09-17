@@ -1,0 +1,49 @@
+[
+  {
+    "id": "1",
+    "year": "2018",
+    "date": "14 de Outubro de 2018",
+    "title": "O Primeiro Olhar",
+    "subtitle": "O início da nossa história",
+    "description": "Substitua aqui pelo relato do primeiro encontro ou de quando vocês se conheceram. Um momento inesquecível que marcou o início de uma linda jornada a dois.",
+    "location": "Onde tudo começou",
+    "image": "/1.jpg"
+  },
+  {
+    "id": "2",
+    "year": "2020",
+    "date": "20 de Julho de 2020",
+    "title": "O Pedido de Namoro",
+    "subtitle": "Entre risos e promessas",
+    "description": "Substitua aqui pela história de como o namoro oficial começou, as memórias mais doces e os primeiros passos construídos lado a lado.",
+    "location": "Um lugar especial"
+  },
+  {
+    "id": "3",
+    "year": "2022",
+    "date": "12 de Novembro de 2022",
+    "title": "Grandes Conquistas",
+    "subtitle": "Crescendo e construindo sonhos",
+    "description": "Substitua aqui pelas vitórias compartilhadas, viagens inesquecíveis e o fortalecimento do companheirismo e da cumplicidade que nos une.",
+    "location": "Nossas memórias"
+  },
+  {
+    "id": "4",
+    "year": "2024",
+    "date": "08 de Dezembro de 2024",
+    "title": "O 'Sim' Para Sempre",
+    "subtitle": "O noivado inesquecível",
+    "description": "Substitua aqui pela história emocionante do pedido de casamento, o momento do 'sim' e a certeza de querer compartilhar toda a vida juntos.",
+    "location": "O dia do noivado",
+    "image": "/1.jpg"
+  },
+  {
+    "id": "5",
+    "year": "2026",
+    "date": "22 de Novembro de 2026",
+    "title": "O Grande Dia",
+    "subtitle": "A celebração do nosso amor",
+    "description": "A consagração do nosso matrimônio diante de Deus, de nossas famílias e dos amigos que mais amamos. O início do nosso felizes para sempre.",
+    "location": "Nossa cerimônia"
+  }
+]

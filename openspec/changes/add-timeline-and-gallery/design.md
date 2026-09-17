@@ -1,0 +1,50 @@
+## Context
+
+O projeto adota uma estética medieval, gótica, vintage e romântica. Após análise crítica da experiência de navegação, identificou-se a necessidade de eliminar resquícios de "tech-minimalismo" (cantos redondos em pílula, glassmorphism acrílico, ícones de e-commerce e grades densas) em prol de uma linguagem mais cenográfica, cinematográfica e botânica autêntica.
+
+A motivação e os objetivos da expansão estão descritos em `proposal.md`.
+
+## Goals / Non-Goals
+
+**Goals:**
+- **Carrossel Horizontal de Grande Escala**: Apresentar a galeria com o acervo de pré-wedding em formato horizontal contínuo (`embla-carousel-react`), com imagens verticais e horizontais em grande destaque (65vh a 75vh de altura), títulos em vermelho bordô (`text-primary`), sem ícones de preview e com navegação fluida por toque e botões medievais.
+- **Eixo Botânico Orgânico na Timeline**: Substituir conectores retos de SVG por um ativo botânico de galho de roseira/vinha espinhosa com nós florais autênticos e madeira texturizada.
+- **Máscara de Foco e Profundidade de Campo (Borrão / Vinheta)**: Adicionar gradientes com leve desfoque suave no topo e no rodapé da janela para que os elementos ganhem nitidez máxima exclusivamente no terço central da tela ao rolar, eliminando sensação de sobrecarga visual.
+- **Geometria Medieval Autêntica**: Substituir cantos em pílula (`rounded-full`) e efeitos de vidro fosco (`backdrop-blur`) por cantos retos góticos (`rounded-none` ou `rounded-[2px]`), filetes metálicos e fundos escuros profundos.
+
+**Non-Goals:**
+- Manter grade estática estilo e-commerce para fotos de casamento.
+- Alterar o acervo de fotos já aprovado de `public/pre-wedding/`.
+
+## Decisions
+
+### 1. Carrossel Horizontal com Embla Carousel
+- **Decisão**: Utilizar `embla-carousel-react` (já instalado no projeto) para montar a seção da galeria.
+- **Configuração**:
+  - Slides com largura dinâmica (`w-[85vw] sm:w-[55vw] lg:w-[42vw]`) e altura imersiva (`h-[65vh] md:h-[72vh]`).
+  - Alinhamento centralizado (`align: "center"`).
+  - Títulos em vermelho bordeaux (`text-primary`), subtítulo em Cormorant Garamond itálico.
+  - Eliminação total do ícone `<Eye />` para deixar a fotografia respirar livremente.
+
+### 2. Eixo Botânico Realista na Timeline
+- **Decisão**: Gerar/utilizar um elemento botânico fotográfico de alta resolução representando o caule de uma roseira escura com espinhos pontiagudos e ramificações naturais, repetido ao longo da linha conectora da timeline.
+- **Justificativa**: Conecta diretamente a estética visual da página com o ornamento floral histórico já presente no topo do Hero (`image-from-rawpixel-id-16379032-png.png`).
+
+### 3. Máscara de Desfoque Óptico na Rolagem (Sem Vinheta Escura)
+- **Decisão**: Remover qualquer gradiente preto ou vinheta escurecida que pesava a interface e reter exclusivamente o efeito óptico de desfoque suave (`backdrop-blur-sm`), atenuado por máscara de transparência gradual nas extremidades superior e inferior:
+  - Topo: `fixed top-0 inset-x-0 h-24 sm:h-32 backdrop-blur-sm pointer-events-none z-30`
+  - Base: `fixed bottom-0 inset-x-0 h-24 sm:h-32 backdrop-blur-sm pointer-events-none z-30`
+- **Justificativa**: Atende diretamente ao pedido do usuário de reduzir o efeito de blur, descartar a vinheta e evitar sobrecarga visual sem escurecer os elementos.
+
+### 4. Centralização Vertical da Seção Inicial (Hero)
+- **Decisão**: Configurar a seção `#inicio` com `min-h-screen flex flex-col items-center justify-center text-center`, acomodando harmoniosamente o cabeçalho, os nomes dos noivos, contador regressivo e botão de áudio após a remoção do bloco de presentes do topo.
+
+### 5. Depuração de Estilo: Menos Tech, Mais Gótico
+- **Decisão**:
+  - No `HeaderNav`: Remover a borda em pílula (`rounded-full`), adotando navegação limpa, alinhada e com tipografia pura.
+  - Nos cartões da timeline: Cantos retos (`rounded-none`), moldura fina dupla e fundo escuro opaco com alto contraste.
+
+## Risks / Trade-offs
+
+- **[Risco: Carrossel horizontal em dispositivos móveis travar a rolagem vertical da página]**
+  - *Mitigação*: Configurar opções adequadas no Embla Carousel (`dragFree: false`, suporte nativo a gestos táteis com eixo horizontal isolado).

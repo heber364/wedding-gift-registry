@@ -27,6 +27,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { HeaderNav } from "@/components/HeaderNav";
+import { CoupleTimeline } from "@/components/timeline/CoupleTimeline";
+import { PhotoGallery } from "@/components/gallery/PhotoGallery";
+import { FloatingMusicPlayer } from "@/components/FloatingMusicPlayer";
+import { ScrollFocusMask } from "@/components/ui/ScrollFocusMask";
 
 type SortOption = "default" | "price-asc" | "price-desc";
 
@@ -81,10 +86,26 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <ScrollFocusMask />
       <InteractiveEnvelope />
-      {/* Hero Header */}
-      <header className="relative py-24 md:py-32 flex flex-col items-center justify-center text-center px-4 border-b border-border/30 overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+      <HeaderNav />
+      {/* Hero Header Centralizado Verticalmente */}
+      <header id="inicio" className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 border-b border-border/30 overflow-hidden">
+        {/* Plano de fundo fotográfico do ensaio medieval (1.jpg) */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <Image
+            src="/1.jpg"
+            alt="Helloisa & Héber Ensaio Medieval"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_25%] opacity-30 filter contrast-125 brightness-75 mix-blend-luminosity scale-105"
+          />
+          {/* Camadas de escurecimento, vinheta e gradientes para legibilidade do texto */}
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.5)_0%,hsl(var(--background))_85%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-transparent to-background" />
+        </div>
 
         {/* Top left floral ornament */}
         <div className="absolute -top-2 -left-2 md:top-0 md:left-0 w-40 h-40 md:w-64 md:h-64 z-10 pointer-events-none opacity-90 drop-shadow-sm ">
@@ -108,13 +129,11 @@ export default function Home() {
           />
         </div>
 
-
-        <div className="relative z-10 max-w-3xl space-y-6 pt-8">
-          <p className="text-primary uppercase tracking-[0.3em] text-sm md:text-base">Lista de Presentes</p>
+        <div className="relative z-10 max-w-3xl w-full my-auto flex flex-col items-center justify-center space-y-6 pt-12 md:pt-16 pb-8">
           <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
             Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
-          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-4 mb-8">
+          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-2 mb-6">
             <span className="w-12 h-px bg-border" />
             <p className="tracking-widest uppercase text-sm">22 de Novembro de 2026</p>
             <span className="w-12 h-px bg-border" />
@@ -122,16 +141,16 @@ export default function Home() {
 
           <CountdownTimer />
 
-          <p className="max-w-xl mx-auto text-muted-foreground pt-8 leading-relaxed">
+          <p className="max-w-xl mx-auto text-muted-foreground pt-4 leading-relaxed font-sans">
             Nossa maior alegria é celebrar este momento com vocês.
             Caso queiram nos abençoar com um presente, preparamos esta lista com muito carinho.
           </p>
 
-          <div className="pt-8">
+          <div className="pt-4">
             <Button
               variant="outline"
               onClick={() => setIsPlaying(!isPlaying)}
-              className="group relative flex items-center justify-center gap-3 mx-auto px-8 h-12 border-primary/40 bg-background/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-500 rounded-sm font-serif italic tracking-widest text-sm uppercase shadow-glow-secondary hover:shadow-glow-primary backdrop-blur-sm"
+              className="group relative flex items-center justify-center gap-3 mx-auto px-8 h-12 border-primary/50 bg-background/60 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-500 rounded-none font-serif italic tracking-widest text-sm uppercase shadow-glow-secondary hover:shadow-glow-primary backdrop-blur-xs"
             >
               {isPlaying ? (
                 <>
@@ -161,8 +180,24 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* Linha do Tempo da História do Casal */}
+      <CoupleTimeline />
+
+      {/* Galeria de Fotos */}
+      <PhotoGallery />
+
+      {/* Main Content - Lista de Presentes */}
+      <main id="presentes" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 scroll-mt-16">
+        {/* Cabeçalho da Lista de Presentes */}
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
+          <p className="text-primary uppercase tracking-[0.3em] text-xs md:text-sm font-medium">
+            Módulo de Presentes
+          </p>
+          <h2 className="font-serif text-4xl md:text-5xl font-normal tracking-wide text-foreground">
+            Lista de Casamento
+          </h2>
+          <div className="w-16 h-px bg-primary/40 mx-auto mt-2" />
+        </div>
 
         {/* Stats Summary */}
         {summary && (
@@ -295,6 +330,12 @@ export default function Home() {
       <FreeValueModal
         isOpen={showFreeValueModal}
         onClose={() => setShowFreeValueModal(false)}
+      />
+
+      {/* Tocador de Música Flutuante Inferior Direito */}
+      <FloatingMusicPlayer
+        isPlaying={isPlaying}
+        onToggle={() => setIsPlaying(!isPlaying)}
       />
     </div>
   );
