@@ -41,7 +41,7 @@ A motivação e os objetivos da expansão estão descritos em `proposal.md`.
 
 ### 5. Depuração de Estilo: Menos Tech, Mais Gótico
 - **Decisão**:
-  - No `HeaderNav`: Remover a borda em pílula (`rounded-full`), adotando navegação limpa, alinhada e com tipografia pura.
+  - No `HeaderNav`: Remover a borda em pílula (`rounded-full`), adotando navegação limpa, alinhada e com tipografia pura. Em dispositivos móveis (`md:hidden`), substituir o menu horizontal por uma barra superior móvel com monograma ("H & H") e botão "MENU ✦" que expande uma sobreposição (overlay) gótica nobre em tela cheia, com cantoneiras decorativas, divisor medieval e links capitulares generosos para toque confortável (mínimo 44px).
   - Nos cartões da timeline: Cantos retos (`rounded-none`), moldura fina dupla e fundo escuro opaco com alto contraste.
 
 ### 6. Redesign Gótico e Solene da Lista de Presentes

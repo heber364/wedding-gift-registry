@@ -40,3 +40,17 @@ O sistema DEVE exibir um botão flutuante e interativo do tocador de música no 
 #### Scenario: Alternância de reprodução no botão flutuante
 - **WHEN** o usuário clica no botão flutuante
 - **THEN** a trilha sonora alterna entre reproduzir e pausar de forma sincronizada com o player principal
+
+### Requirement: Navegação Responsiva para Dispositivos Móveis (Header Mobile)
+O cabeçalho de navegação DEVE ser totalmente adaptado para telas móveis e smartphones (viewports `< 768px`):
+- O sistema DEVE ocultar o menu horizontal longo que transborda a largura do celular e substituí-lo por uma barra superior móvel compacta com monograma do casal ("H & H") e botão acionador de menu ("MENU ✦");
+- O botão acionador DEVE abrir uma sobreposição (overlay / drawer) temática gótica em tela cheia com fundo escurecido aveludado, cantoneiras decorativas e divisor medieval;
+- O menu móvel DEVE listar todas as opções de navegação com tipografia de destaque Cormorant Garamond e numeração romana ou losangos heráldicos, com áreas de toque adequadas (mínimo 44px de altura);
+- O sistema DEVE fechar automaticamente o menu móvel ao clicar em qualquer link (executando a rolagem suave até a seção de destino) ou ao acionar o botão de fechamento.
+
+#### Scenario: Acesso ao cabeçalho em dispositivo móvel
+- **WHEN** o visitante acessa o site em uma tela de largura reduzida (< 768px)
+- **THEN** a barra superior móvel é exibida sem transbordamento horizontal e sem quebras de linha indesejadas
+- **THEN** ao clicar no botão de menu, a sobreposição gótica é exibida com todos os links em tamanho confortável para toque
+- **THEN** ao selecionar um dos destinos, o menu fecha suavemente e a página rola até a seção escolhida
+

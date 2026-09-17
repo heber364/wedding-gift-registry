@@ -21,6 +21,7 @@
 
 - [x] 4.1 Ajustar `HeaderNav.tsx` removendo cantos em pílula plástica (`rounded-full`) e aplicando acabamento fino medieval
 - [x] 4.3 Centralizar verticalmente a seção inicial Hero (`#inicio`) com `min-h-screen` e distribuição harmônica de espaçamento
+- [x] 4.4 Implementar navegação responsiva mobile em `HeaderNav.tsx` com barra compacta, monograma e overlay/drawer gótico com links acessíveis para toque
 - [x] 4.2 Validar responsividade em dispositivos móveis e desktop e executar compilação de produção (`npm run build`)
 
 ## 5. Redesign Gótico e Medieval da Lista de Presentes
