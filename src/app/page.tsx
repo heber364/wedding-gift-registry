@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { HeaderNav } from "@/components/HeaderNav";
@@ -103,8 +101,8 @@ export default function Home() {
             className="object-cover object-center opacity-40 filter contrast-105 brightness-95 scale-105"
           />
           {/* Camadas de escurecimento, vinheta e gradientes para legibilidade do texto */}
-          <div className="absolute inset-0 bg-background/50 backdrop-blur-[0.5px]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.25)_0%,hsl(var(--background))_85%)]" />
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-[0.2px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.15)_0%,hsl(var(--background))_85%)]" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-transparent to-background" />
         </div>
 
@@ -147,36 +145,16 @@ export default function Home() {
             Caso queiram nos abençoar com um presente, preparamos esta lista com muito carinho.
           </p>
 
-          <div className="pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="group relative flex items-center justify-center gap-3 mx-auto px-8 h-12 border-primary/50 bg-background/60 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-500 rounded-none font-serif italic tracking-widest text-sm uppercase shadow-glow-secondary hover:shadow-glow-primary backdrop-blur-xs"
-            >
-              {isPlaying ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
-                  Pausar Música
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4 fill-current opacity-80 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Ouvir Trilha Sonora
-                </>
-              )}
-            </Button>
-            <div className="absolute opacity-0 pointer-events-none w-0 h-0 overflow-hidden">
-              <ReactPlayer
-                src={url}
-                playing={isPlaying}
-                loop={true}
-                volume={0.5}
-                width="10px"
-                height="10px"
-              />
-            </div>
+          {/* Player de áudio em segundo plano (acionado pelo tocador lateral flutuante) */}
+          <div className="absolute opacity-0 pointer-events-none w-0 h-0 overflow-hidden">
+            <ReactPlayer
+              src={url}
+              playing={isPlaying}
+              loop={true}
+              volume={0.5}
+              width="10px"
+              height="10px"
+            />
           </div>
         </div>
       </header>
