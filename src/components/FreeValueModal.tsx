@@ -107,57 +107,63 @@ export function FreeValueModal({ isOpen, onClose }: FreeValueModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[440px] bg-card border-border/50 shadow-2xl">
+      <DialogContent className="sm:max-w-[460px] bg-card/95 border border-border/80 rounded-none shadow-2xl shadow-black p-6 sm:p-8 relative">
+        {/* Cantoneiras Góticas da Moldura */}
+        <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-primary/60 pointer-events-none" />
+        <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-primary/60 pointer-events-none" />
+        <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-primary/60 pointer-events-none" />
+        <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-primary/60 pointer-events-none" />
+
         {showPixQrCode ? (
-          <div className="py-6 flex flex-col items-center text-center space-y-6">
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl text-foreground">Pagamento via PIX</DialogTitle>
-              <DialogDescription className="text-muted-foreground">
+          <div className="py-4 flex flex-col items-center text-center space-y-6">
+            <DialogHeader className="text-center">
+              <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Pagamento via PIX</DialogTitle>
+              <DialogDescription className="text-muted-foreground font-sans text-xs">
                 Escaneie o QR Code abaixo ou copie a chave para pagar no app do seu banco.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-              <QRCode value={pixPayload} size={200} />
+            <div className="bg-white p-4 rounded-none shadow-xl border border-border/60">
+              <QRCode value={pixPayload} size={190} />
             </div>
 
             <div className="w-full space-y-2">
-              <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
+              <Label className="text-muted-foreground font-serif text-xs uppercase tracking-widest">PIX Copia e Cola / Chave PIX</Label>
               <div className="flex items-center gap-2">
-                <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
-                <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
-                  <Copy className="w-4 h-4" />
+                <Input value={pixPayload} readOnly className="font-mono text-xs text-center rounded-none border-border/70 bg-background/50 h-10" />
+                <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave" className="rounded-none border-border/70 hover:border-primary">
+                  <Copy className="w-4 h-4 text-primary" />
                 </Button>
               </div>
             </div>
 
-            <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
               <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
             </Button>
           </div>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl text-foreground">Presente de Valor Livre</DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Escolha o valor que desejar. Agradecemos muito pelo seu carinho e contribuição!
+            <DialogHeader className="text-center sm:text-left">
+              <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Presente de Valor Livre</DialogTitle>
+              <DialogDescription className="text-muted-foreground font-sans text-xs leading-relaxed">
+                Escolha o valor que desejar. Agradecemos muito pelo seu carinho e bênção!
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6 mt-2">
-              <div className="space-y-3">
-                <Label className="text-foreground">Digite o valor desejado</Label>
+            <div className="space-y-6 mt-3">
+              <div className="space-y-2">
+                <Label className="text-foreground font-serif text-xs uppercase tracking-widest">Digite o valor desejado</Label>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground font-medium pl-1">R$</span>
+                    <span className="text-primary font-serif text-lg font-medium pl-1">R$</span>
                     <Input
                       type="number"
                       step="0.01"
                       min="1"
-                      placeholder="1.00"
+                      placeholder="100.00"
                       value={customValue}
                       onChange={(e) => setCustomValue(e.target.value)}
-                      className={`bg-background/50 border-border focus-visible:ring-primary h-10 ${inputError ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                      className={`bg-background/60 border-border/70 focus-visible:ring-primary h-11 rounded-none font-serif text-lg ${inputError ? "border-destructive focus-visible:ring-destructive" : ""}`}
                       autoFocus
                     />
                   </div>
@@ -168,14 +174,14 @@ export function FreeValueModal({ isOpen, onClose }: FreeValueModalProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message" className="text-foreground">Mensagem para os noivos (Opcional)</Label>
+                <Label htmlFor="message" className="text-foreground font-serif text-xs uppercase tracking-widest">Mensagem para os noivos (Opcional)</Label>
                 <Input
                   id="message"
-                  placeholder="Deixe uma mensagem..."
+                  placeholder="Deixe uma mensagem afetuosa..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   maxLength={50}
-                  className="bg-background/50 border-border focus-visible:ring-primary h-10"
+                  className="bg-background/60 border-border/70 focus-visible:ring-primary h-10 rounded-none font-sans text-sm"
                 />
                 <p className="text-[10px] text-muted-foreground text-right">{message.length}/50</p>
               </div>
@@ -184,7 +190,7 @@ export function FreeValueModal({ isOpen, onClose }: FreeValueModalProps) {
                 <Button
                   onClick={handlePix}
                   disabled={!isValid}
-                  className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
+                  className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 border border-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase shadow-glow-primary transition-all"
                 >
                   <QrCode className="w-4 h-4 mr-2" />
                   Pagar com PIX
@@ -193,10 +199,10 @@ export function FreeValueModal({ isOpen, onClose }: FreeValueModalProps) {
                   onClick={handleCreditCheckout} 
                   disabled={!isValid || isGeneratingCheckout}
                   variant="outline" 
-                  className="w-full h-11 border-border text-foreground hover:bg-muted"
+                  className="w-full h-11 border-border/70 text-foreground hover:border-primary/60 hover:text-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase transition-all"
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  {isGeneratingCheckout ? "Gerando pagamento..." : "Pagar com Cartão"}
+                  {isGeneratingCheckout ? "Gerando pagamento..." : "Pagar com Cartão de Crédito"}
                 </Button>
               </div>
             </div>
