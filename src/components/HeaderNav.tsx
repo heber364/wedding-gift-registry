@@ -93,37 +93,43 @@ export function HeaderNav() {
       </header>
 
       {/* ─── MOBILE TOP BAR (< 768px) ─── */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between px-4 py-3 pointer-events-auto transition-all duration-500">
+      <header className="fixed top-0 left-0 right-0 z-40 flex md:hidden pointer-events-none transition-all duration-500">
+        {/* Camada de Blur Progressivo que se desfaz suavemente sem linha/borda de corte */}
         <div
-          className={`absolute inset-0 transition-all duration-500 pointer-events-none -z-10 ${
-            scrolled
-              ? "bg-background/95 border-b border-primary/30 shadow-xl shadow-black/80 backdrop-blur-md"
-              : "bg-background/50 border-b border-border/20 backdrop-blur-xs"
+          className={`absolute inset-x-0 top-0 h-24 sm:h-28 transition-opacity duration-700 pointer-events-none -z-10 backdrop-blur-md ${
+            scrolled ? "opacity-100" : "opacity-85"
           }`}
+          style={{
+            background: "linear-gradient(to bottom, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.6) 45%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
+            maskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
+          }}
         />
 
-        {/* Monograma do Casal */}
-        <a
-          href="#inicio"
-          onClick={(e) => handleScrollTo(e, "#inicio")}
-          className="font-serif tracking-[0.25em] text-xs uppercase text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
-        >
-          <span>H</span>
-          <span className="text-primary text-[10px]">✦</span>
-          <span>H</span>
-        </a>
+        <div className="flex items-center justify-between w-full px-5 py-3.5 pointer-events-auto">
+          {/* Monograma do Casal */}
+          <a
+            href="#inicio"
+            onClick={(e) => handleScrollTo(e, "#inicio")}
+            className="font-serif tracking-[0.25em] text-xs uppercase text-foreground/90 hover:text-primary transition-colors flex items-center gap-1.5 drop-shadow-sm select-none py-1"
+          >
+            <span>H</span>
+            <span className="text-primary text-[10px]">✦</span>
+            <span>H</span>
+          </a>
 
-        {/* Botão Acionador de Menu */}
-        <button
-          type="button"
-          onClick={() => setIsMobileMenuOpen(true)}
-          aria-expanded={isMobileMenuOpen}
-          aria-label="Abrir menu de navegação"
-          className="rounded-none border border-border/70 hover:border-primary/80 bg-card/60 active:bg-primary/10 px-3 py-1.5 text-xs font-serif tracking-[0.2em] uppercase flex items-center gap-2 text-foreground/90 hover:text-primary transition-all duration-300"
-        >
-          <Menu className="w-3.5 h-3.5 text-primary" />
-          <span>Menu</span>
-        </button>
+          {/* Botão Acionador de Menu (Sem borda marcada) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-expanded={isMobileMenuOpen}
+            aria-label="Abrir menu de navegação"
+            className="flex items-center gap-2 py-1.5 px-2 text-xs font-serif tracking-[0.25em] uppercase text-foreground/85 hover:text-primary active:text-primary transition-colors duration-300 focus:outline-none select-none border-none bg-transparent shadow-none"
+          >
+            <Menu className="w-4 h-4 text-primary" />
+            <span>Menu</span>
+          </button>
+        </div>
       </header>
 
       {/* ─── MOBILE MENU OVERLAY / GAVETA GÓTICA (< 768px) ─── */}
@@ -149,7 +155,7 @@ export function HeaderNav() {
               type="button"
               onClick={() => setIsMobileMenuOpen(false)}
               aria-label="Fechar menu"
-              className="rounded-none border border-border/70 hover:border-primary/80 active:bg-primary/10 px-3 py-1.5 font-serif text-xs uppercase tracking-[0.2em] flex items-center gap-1.5 text-foreground hover:text-primary transition-colors min-h-[40px]"
+              className="border-none bg-transparent px-2 py-1 font-serif text-xs uppercase tracking-[0.2em] flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors min-h-[40px] focus:outline-none"
             >
               <X className="w-4 h-4 text-primary" />
               <span>Fechar</span>
