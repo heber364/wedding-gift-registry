@@ -65,14 +65,22 @@ export function HeaderNav() {
   return (
     <>
       {/* ─── DESKTOP HEADER (≥ 768px) ─── */}
-      <header className="fixed top-0 left-0 right-0 z-40 hidden md:flex justify-center px-4 py-4 md:py-6 pointer-events-none transition-all duration-500">
+      <header className="fixed top-0 left-0 right-0 z-40 hidden md:flex justify-center pointer-events-none transition-all duration-500">
+        {/* Camada de Blur Progressivo Desktop que se desfaz suavemente sem linha/borda de corte */}
+        <div
+          className={`absolute inset-x-0 top-0 h-28 lg:h-32 transition-opacity duration-700 pointer-events-none -z-10 backdrop-blur-md ${
+            scrolled ? "opacity-100" : "opacity-85"
+          }`}
+          style={{
+            background: "linear-gradient(to bottom, hsl(var(--background) / 0.95) 0%, hsl(var(--background) / 0.5) 45%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
+            maskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 100%)",
+          }}
+        />
+
         <nav
           aria-label="Navegação Principal Desktop"
-          className={`pointer-events-auto flex items-center gap-4 lg:gap-8 px-8 lg:px-10 py-3 transition-all duration-500 ${
-            scrolled
-              ? "bg-background/90 border-b border-primary/30 shadow-2xl shadow-black/90 backdrop-blur-md"
-              : "bg-transparent border-b border-transparent"
-          }`}
+          className="pointer-events-auto flex items-center gap-6 lg:gap-10 px-8 py-5 transition-all duration-500 bg-transparent border-none shadow-none"
         >
           {NAV_ITEMS.map((item, idx) => (
             <React.Fragment key={item.href}>
@@ -82,7 +90,7 @@ export function HeaderNav() {
               <a
                 href={item.href}
                 onClick={(e) => handleScrollTo(e, item.href)}
-                className="font-serif tracking-[0.2em] uppercase text-xs lg:text-sm text-foreground/80 hover:text-primary transition-colors duration-300 relative py-1 group"
+                className="font-serif tracking-[0.22em] uppercase text-xs lg:text-sm text-foreground/85 hover:text-primary transition-colors duration-300 relative py-1.5 group select-none drop-shadow-sm"
               >
                 {item.label}
                 <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all duration-300 ease-out" />
