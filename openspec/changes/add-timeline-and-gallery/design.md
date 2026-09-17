@@ -44,6 +44,13 @@ A motivação e os objetivos da expansão estão descritos em `proposal.md`.
   - No `HeaderNav`: Remover a borda em pílula (`rounded-full`), adotando navegação limpa, alinhada e com tipografia pura.
   - Nos cartões da timeline: Cantos retos (`rounded-none`), moldura fina dupla e fundo escuro opaco com alto contraste.
 
+### 6. Redesign Gótico e Solene da Lista de Presentes
+- **Decisão**:
+  - **Identidade da Seção**: Adicionar `MedievalDivider` no cabeçalho da seção `#presentes`, com subtítulo evocativo ("Tributos e Lembranças aos Noivos"). Redesenhar a placa de resumo (disponíveis / reservados) como um brasão ou pergaminho emoldurado (`rounded-none`, borda nobre).
+  - **Filtros e Busca**: Transformar os controles de e-commerce genéricos em botões e campos medievais com cantos retos, acentos em carmesim bordô e brilho de brasa (`shadow-glow-primary`).
+  - **Cartões de Presente (`GiftCard` e `FreeValueGiftCard`)**: Cantos retos góticos (`rounded-none`), moldura de códice antigo com cantoneiras aparentes, selos de reserva estilo sinete de cera, e preços imponentes na tipografia Cormorant Garamond.
+  - **Modais (`ReservationModal` e `FreeValueModal`)**: Manter rigorosamente o mesmo acabamento cenográfico nos diálogos de checkout e reserva.
+
 ## Risks / Trade-offs
 
 - **[Risco: Carrossel horizontal em dispositivos móveis travar a rolagem vertical da página]**

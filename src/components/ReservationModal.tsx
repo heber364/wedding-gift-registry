@@ -115,11 +115,11 @@ const playSadSound = () => {
 
 const RainOverlay = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[100000] bg-slate-900/50 flex overflow-hidden animate-in fade-in duration-500">
+    <div className="fixed inset-0 pointer-events-none z-[100000] bg-black/60 flex overflow-hidden animate-in fade-in duration-500">
       {Array.from({ length: 100 }).map((_, i) => (
         <div
           key={i}
-          className="absolute bg-blue-300/60 w-[2px] rounded-full"
+          className="absolute bg-primary/40 w-[1.5px] rounded-none"
           style={{
             height: `${Math.random() * 30 + 10}px`,
             left: `${Math.random() * 100}%`,
@@ -354,43 +354,48 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[440px] bg-card border-border/50 shadow-2xl">
+      <DialogContent className="sm:max-w-[460px] bg-card/95 border border-border/80 rounded-none shadow-2xl shadow-black p-6 sm:p-8 relative">
+        {/* Cantoneiras Góticas da Moldura */}
+        <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-primary/60 pointer-events-none" />
+        <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-primary/60 pointer-events-none" />
+        <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-primary/60 pointer-events-none" />
+        <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-primary/60 pointer-events-none" />
 
         {/* Case 1: Gift is reserved by this guest — offer to unreserve */}
         {isOwnReservation && !isSuccess ? (
           showPixQrCode ? (
             /* Case 1b: Show Pix QR Code inside Own Reservation */
-            <div className="py-6 flex flex-col items-center text-center space-y-6">
-              <DialogHeader>
-                <DialogTitle className="font-serif text-2xl text-foreground">Pagamento via PIX</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+            <div className="py-4 flex flex-col items-center text-center space-y-6">
+              <DialogHeader className="text-center">
+                <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Pagamento via PIX</DialogTitle>
+                <DialogDescription className="text-muted-foreground font-sans text-xs">
                   Escaneie o QR Code abaixo ou copie a chave para pagar no app do seu banco.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={pixPayload} size={200} />
+              <div className="bg-white p-4 rounded-none shadow-xl border border-border/60">
+                <QRCode value={pixPayload} size={190} />
               </div>
 
               <div className="w-full space-y-2">
-                <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
+                <Label className="text-muted-foreground font-serif text-xs uppercase tracking-widest">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
-                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
-                    <Copy className="w-4 h-4" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center rounded-none border-border/70 bg-background/50 h-10" />
+                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave" className="rounded-none border-border/70 hover:border-primary">
+                    <Copy className="w-4 h-4 text-primary" />
                   </Button>
                 </div>
               </div>
 
-              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
               </Button>
             </div>
           ) : (
             <>
-              <DialogHeader>
-                <DialogTitle className="font-serif text-2xl text-foreground">Sua Reserva</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+              <DialogHeader className="text-center sm:text-left">
+                <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Sua Reserva</DialogTitle>
+                <DialogDescription className="text-muted-foreground font-sans text-xs leading-relaxed">
                   Você reservou{" "}
                   <strong className="text-foreground font-medium">{gift.name}</strong> —{" "}
                   {formatCurrency(gift.price)}.
@@ -398,28 +403,28 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
               </DialogHeader>
 
               {gift.imageUrl && (
-                <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
+                <div className="w-full aspect-[4/3] overflow-hidden border border-border/70 mt-2 relative flex items-center justify-center rounded-none bg-background/80">
                   <div
-                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                    className="absolute inset-0 bg-cover bg-center opacity-25 blur-xl scale-110"
                     style={{ backgroundImage: `url(${gift.imageUrl})` }}
                   />
-                  <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
+                  <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10 p-2" />
                 </div>
               )}
 
               <div className="space-y-4 mt-4">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Reservado por <span className="text-foreground font-medium">{gift.reservedBy}</span>.
                 </p>
 
                 <div className="flex flex-col gap-3 pt-2">
                   {gift.isPurchased ? (
-                    <div className="p-4 bg-muted/50 rounded-lg text-center space-y-2 border border-border">
-                      <div className="mx-auto w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
+                    <div className="p-4 bg-muted/40 rounded-none text-center space-y-2 border border-border/70">
+                      <div className="mx-auto w-10 h-10 rounded-none bg-primary/20 flex items-center justify-center text-primary mb-2 border border-primary/40">
                         <Check className="w-5 h-5" />
                       </div>
-                      <h4 className="font-medium text-foreground">Presente já comprado</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <h4 className="font-serif text-lg font-normal text-foreground">Presente já comprado</h4>
+                      <p className="text-xs text-muted-foreground font-sans">
                         Este presente já foi marcado como comprado. Agradecemos muito pelo carinho!
                       </p>
                     </div>
@@ -427,7 +432,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                     <>
                       <Button
                         onClick={() => setShowPixQrCode(true)}
-                        className="w-full h-11 bg-card hover:bg-accent border border-primary text-foreground"
+                        className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 border border-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase shadow-glow-primary transition-all"
                       >
                         <QrCode className="w-4 h-4 mr-2" />
                         Presentear com PIX
@@ -436,21 +441,21 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                         onClick={handleCreditCheckout} 
                         disabled={isGeneratingCheckout}
                         variant="outline" 
-                        className="w-full h-11 border-border text-foreground hover:bg-muted"
+                        className="w-full h-11 border-border/70 text-foreground hover:border-primary/60 hover:text-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase transition-all"
                       >
                         <CreditCard className="w-4 h-4 mr-2" />
                         {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão de Crédito"}
                       </Button>
                       {gift.productLink && (
                         <div className="w-full flex flex-col gap-2">
-                          <Button asChild variant="outline" className="w-full h-11 border-border text-foreground hover:bg-muted">
+                          <Button asChild variant="outline" className="w-full h-11 border-border/70 text-foreground hover:border-primary/60 hover:text-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase">
                             <a href={gift.productLink} target="_blank" rel="noreferrer">
                               <ShoppingCart className="w-4 h-4 mr-2" />
                               Comprar diretamente no site
                             </a>
                           </Button>
-                          <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
-                            <strong>Endereço para entrega:</strong><br />
+                          <p className="text-xs text-muted-foreground bg-card/60 border border-border/60 p-3 rounded-none text-center font-sans">
+                            <strong className="font-serif uppercase tracking-widest text-primary text-[11px]">Endereço para entrega:</strong><br />
                             R. Júlio José de Oliveira, 1250 - Colina Verde<br />
                             CEP: 45987-400
                           </p>
@@ -461,14 +466,14 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                         onClick={handleCancelClick}
                         disabled={isUnreserving || unreserveByGuest.isPending}
                         style={{ transform: cancelButtonTransform, transition: "transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)", zIndex: escapeCount > 0 ? 50 : 'auto' }}
-                        className="w-full h-11 bg-card border border-dashed border-border/50 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 shadow-lg"
+                        className="w-full h-11 bg-card border border-dashed border-border/60 text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/5 mt-2 rounded-none font-serif text-xs uppercase tracking-widest"
                       >
                         <Unlock className="w-4 h-4 mr-2" />
                         {getCancelButtonText()}
                       </Button>
                     </>
                   )}
-                  <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+                  <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
                     Fechar
                   </Button>
                 </div>
@@ -478,67 +483,67 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         ) : !gift.isReserved && !isSuccess ? (
           /* Case 2: Gift is available — reservation form */
           <>
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl text-foreground">Reservar Presente</DialogTitle>
-              <DialogDescription className="text-muted-foreground">
+            <DialogHeader className="text-center sm:text-left">
+              <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Reservar Presente</DialogTitle>
+              <DialogDescription className="text-muted-foreground font-sans text-xs leading-relaxed">
                 Você está reservando{" "}
                 <strong className="text-foreground font-medium">{gift.name}</strong> —{" "}
-                <strong className="text-foreground font-medium">{formatCurrency(gift.price)}</strong>.
+                <strong className="text-primary font-serif font-normal text-sm">{formatCurrency(gift.price)}</strong>.
               </DialogDescription>
             </DialogHeader>
 
             {gift.imageUrl && (
-              <div className="w-full aspect-[4/3] overflow-hidden border border-border/50 mt-2 relative flex items-center justify-center rounded-lg">
+              <div className="w-full aspect-[4/3] overflow-hidden border border-border/70 mt-2 relative flex items-center justify-center rounded-none bg-background/80">
                 <div
-                  className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+                  className="absolute inset-0 bg-cover bg-center opacity-25 blur-xl scale-110"
                   style={{ backgroundImage: `url(${gift.imageUrl})` }}
                 />
-                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10" />
+                <img src={gift.imageUrl} alt={gift.name} className="w-full h-full object-contain relative z-10 p-2" />
               </div>
             )}
 
             <form onSubmit={handleReserve} className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="guest-name" className="text-foreground">Nome completo</Label>
+                <Label htmlFor="guest-name" className="text-foreground font-serif text-xs uppercase tracking-widest">Nome completo</Label>
                 <Input
                   id="guest-name"
                   placeholder="Seu nome"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-background/50 border-border focus-visible:ring-primary"
+                  className="bg-background/60 border-border/70 focus-visible:ring-primary rounded-none h-10 font-sans text-sm"
                   required
                   autoComplete="name"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="guest-phone" className="text-foreground">Telefone de contato</Label>
+                <Label htmlFor="guest-phone" className="text-foreground font-serif text-xs uppercase tracking-widest">Telefone de contato</Label>
                 <Input
                   id="guest-phone"
                   placeholder="(00) 00000-0000"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-background/50 border-border focus-visible:ring-primary"
+                  className="bg-background/60 border-border/70 focus-visible:ring-primary rounded-none h-10 font-sans text-sm"
                   required
                   autoComplete="tel"
                   inputMode="tel"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground/70 font-sans">
                   Seus dados ficam salvos neste dispositivo para facilitar futuras visitas.
                 </p>
               </div>
 
-              <div className="flex gap-3 justify-end pt-2">
+              <div className="flex gap-3 justify-end pt-3">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="border-border text-foreground hover:bg-muted"
+                  className="border-border/70 text-foreground hover:bg-muted rounded-none font-serif text-xs uppercase tracking-widest"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-serif tracking-wide"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-serif tracking-[0.2em] text-xs uppercase rounded-none shadow-glow-primary h-10 px-6"
                   disabled={reserveGift.isPending}
                 >
                   {reserveGift.isPending ? "Reservando..." : "Confirmar Reserva"}
@@ -549,73 +554,73 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         ) : isSuccess ? (
           showPixQrCode ? (
             /* Case 3b: Success Screen showing QR Code */
-            <div className="py-6 flex flex-col items-center text-center space-y-6">
-              <DialogHeader>
-                <DialogTitle className="font-serif text-2xl text-foreground">Pagamento via PIX</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+            <div className="py-4 flex flex-col items-center text-center space-y-6">
+              <DialogHeader className="text-center">
+                <DialogTitle className="font-serif text-2xl md:text-3xl font-normal text-foreground">Pagamento via PIX</DialogTitle>
+                <DialogDescription className="text-muted-foreground font-sans text-xs">
                   Escaneie o QR Code abaixo ou copie a chave para pagar no app do seu banco.
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="bg-white p-4 rounded-xl shadow-sm border border-border/50">
-                <QRCode value={pixPayload} size={200} />
+              <div className="bg-white p-4 rounded-none shadow-xl border border-border/60">
+                <QRCode value={pixPayload} size={190} />
               </div>
 
               <div className="w-full space-y-2">
-                <Label className="text-muted-foreground">PIX Copia e Cola / Chave PIX</Label>
+                <Label className="text-muted-foreground font-serif text-xs uppercase tracking-widest">PIX Copia e Cola / Chave PIX</Label>
                 <div className="flex items-center gap-2">
-                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center" />
-                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave">
-                    <Copy className="w-4 h-4" />
+                  <Input value={pixPayload} readOnly className="font-mono text-xs text-center rounded-none border-border/70 bg-background/50 h-10" />
+                  <Button variant="outline" size="icon" onClick={handleCopyPix} title="Copiar Chave" className="rounded-none border-border/70 hover:border-primary">
+                    <Copy className="w-4 h-4 text-primary" />
                   </Button>
                 </div>
               </div>
 
-              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={() => setShowPixQrCode(false)} className="w-full text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
               </Button>
             </div>
           ) : (
             /* Case 3: Just reserved — success screen with payment links */
-            <div className="py-6 flex flex-col items-center text-center space-y-6">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 animate-bounce">
+            <div className="py-4 flex flex-col items-center text-center space-y-6">
+              <div className="w-16 h-16 rounded-none bg-primary/20 flex items-center justify-center border border-primary/50 shadow-glow-primary">
                 <CheckCircle2 className="w-8 h-8 text-primary" />
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-2xl font-medium text-foreground">Reserva Confirmada!</h3>
-                <p className="text-muted-foreground px-4">
+                <h3 className="font-serif text-2xl md:text-3xl font-normal text-foreground">Reserva Confirmada!</h3>
+                <p className="text-muted-foreground text-xs font-sans px-4 leading-relaxed">
                   Muito obrigado pelo carinho! Realize o pagamento agora através de uma das opções abaixo.
                 </p>
               </div>
 
-              <div className="w-full flex flex-col gap-3 pt-4">
+              <div className="w-full flex flex-col gap-3 pt-2">
                 <Button
                   onClick={() => setShowPixQrCode(true)}
-                  className="w-full h-12 bg-card hover:bg-accent border border-primary text-foreground hover:text-primary-foreground transition-colors"
+                  className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 border border-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase shadow-glow-primary transition-all"
                 >
-                  <QrCode className="w-5 h-5 mr-2" />
+                  <QrCode className="w-4 h-4 mr-2" />
                   Presentear com PIX
                 </Button>
                 <Button 
                   onClick={handleCreditCheckout} 
                   disabled={isGeneratingCheckout}
                   variant="outline" 
-                  className="w-full h-12 border-border text-foreground hover:bg-muted"
+                  className="w-full h-11 border-border/70 text-foreground hover:border-primary/60 hover:text-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase transition-all"
                 >
-                  <CreditCard className="w-5 h-5 mr-2" />
+                  <CreditCard className="w-4 h-4 mr-2" />
                   {isGeneratingCheckout ? "Gerando pagamento..." : "Presentear com Cartão"}
                 </Button>
                 {gift.productLink && (
                   <div className="w-full flex flex-col gap-2">
-                    <Button asChild variant="outline" className="w-full h-12 border-border text-foreground hover:bg-muted">
+                    <Button asChild variant="outline" className="w-full h-11 border-border/70 text-foreground hover:border-primary/60 hover:text-primary rounded-none font-serif tracking-[0.2em] text-xs uppercase">
                       <a href={gift.productLink} target="_blank" rel="noreferrer">
-                        <ShoppingCart className="w-5 h-5 mr-2" />
+                        <ShoppingCart className="w-4 h-4 mr-2" />
                         Comprar diretamente no site
                       </a>
                     </Button>
-                    <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded text-center">
-                      <strong>Endereço para entrega:</strong><br />
+                    <p className="text-xs text-muted-foreground bg-card/60 border border-border/60 p-3 rounded-none text-center font-sans">
+                      <strong className="font-serif uppercase tracking-widest text-primary text-[11px]">Endereço para entrega:</strong><br />
                       R. Júlio José de Oliveira, 1250 - Colina Verde<br />
                       CEP: 45987-400
                     </p>
@@ -623,7 +628,7 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
                 )}
               </div>
 
-              <Button variant="ghost" onClick={onClose} className="mt-2 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={onClose} className="mt-2 text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
                 Fechar
               </Button>
             </div>
@@ -631,8 +636,8 @@ export function ReservationModal({ gift, isOpen, onClose, isTestMode = false }: 
         ) : (
           /* Case 4: Reserved by someone else */
           <div className="py-6 flex flex-col items-center text-center space-y-4">
-            <p className="font-serif text-xl text-muted-foreground">Este presente já foi reservado.</p>
-            <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <p className="font-serif text-xl text-muted-foreground font-normal">Este presente já foi reservado.</p>
+            <Button variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground font-serif text-xs uppercase tracking-widest rounded-none">
               Fechar
             </Button>
           </div>

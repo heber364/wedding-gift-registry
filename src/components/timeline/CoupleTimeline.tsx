@@ -50,21 +50,10 @@ export function CoupleTimeline() {
 
         {/* Linha Central da Linha do Tempo */}
         <div className="relative">
-          {/* Eixo botânico realista: Caule com espinhos de roseira selvagem */}
+          {/* Eixo central com degradê bordeaux refinado */}
           <div 
             aria-hidden="true"
-            className="absolute left-4 md:left-1/2 -translate-x-1/2 top-2 bottom-2 w-8 md:w-12 pointer-events-none overflow-hidden select-none z-0 opacity-80 mix-blend-screen"
-          >
-            <div 
-              className="w-full h-full bg-repeat-y bg-contain bg-center filter contrast-125 brightness-95"
-              style={{ backgroundImage: "url('/thorn-stem.jpg')" }}
-            />
-          </div>
-
-          {/* Eixo de sustentação e brilho bordeaux místico */}
-          <div 
-            aria-hidden="true"
-            className="absolute left-4 md:left-1/2 -translate-x-1/2 top-4 bottom-4 w-[2px] bg-gradient-to-b from-transparent via-primary/50 to-transparent pointer-events-none z-0" 
+            className="absolute left-4 md:left-1/2 -translate-x-1/2 top-4 bottom-4 w-[2px] bg-gradient-to-b from-transparent via-primary/60 to-transparent pointer-events-none z-0 shadow-[0_0_8px_rgba(138,28,48,0.5)]" 
           />
 
           {/* Lista de Eventos alimentada pelo JSON */}

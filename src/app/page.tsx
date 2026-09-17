@@ -32,6 +32,7 @@ import { CoupleTimeline } from "@/components/timeline/CoupleTimeline";
 import { PhotoGallery } from "@/components/gallery/PhotoGallery";
 import { FloatingMusicPlayer } from "@/components/FloatingMusicPlayer";
 import { ScrollFocusMask } from "@/components/ui/ScrollFocusMask";
+import { MedievalDivider } from "@/components/ui/GothicOrnaments";
 
 type SortOption = "default" | "price-asc" | "price-desc";
 
@@ -187,32 +188,41 @@ export default function Home() {
       <PhotoGallery />
 
       {/* Main Content - Lista de Presentes */}
-      <main id="presentes" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 scroll-mt-16">
-        {/* Cabeçalho da Lista de Presentes */}
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
+      <main id="presentes" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 scroll-mt-16">
+        {/* Cabeçalho Solene da Lista de Presentes */}
+        <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
           <p className="text-primary uppercase tracking-[0.3em] text-xs md:text-sm font-medium">
-            Módulo de Presentes
+            Tributos e Lembranças
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl font-normal tracking-wide text-foreground">
+          <h2 className="font-serif text-4xl md:text-6xl font-normal tracking-wide text-foreground">
             Lista de Casamento
           </h2>
-          <div className="w-16 h-px bg-primary/40 mx-auto mt-2" />
+          <MedievalDivider className="my-6" />
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed font-sans max-w-xl mx-auto">
+            Preparamos cada item desta seleção com muito carinho para abençoar a construção do nosso novo lar.
+          </p>
         </div>
 
-        {/* Stats Summary */}
+        {/* Stats Summary - Placa Heráldica Emoldurada */}
         {summary && (
-          <div className="flex justify-center mb-12">
-            <Card className="inline-flex gap-8 md:gap-16 border-border/50 px-8 py-4 bg-card/30 backdrop-blur-sm  shadow-none">
+          <div className="flex justify-center mb-14">
+            <div className="relative inline-flex items-center gap-8 md:gap-16 border border-border/80 px-10 py-5 bg-card/85 shadow-2xl shadow-black rounded-none">
+              {/* Cantoneiras góticas decorativas */}
+              <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-primary/60" />
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 border-t border-r border-primary/60" />
+              <div className="absolute bottom-1.5 left-1.5 w-2 h-2 border-b border-l border-primary/60" />
+              <div className="absolute bottom-1.5 right-1.5 w-2 h-2 border-b border-r border-primary/60" />
+
               <div className="text-center">
-                <p className="text-2xl font-serif text-foreground">{summary.available}</p>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">Disponíveis</p>
+                <p className="text-3xl md:text-4xl font-serif text-foreground font-normal">{summary.available}</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-1 font-serif">Disponíveis</p>
               </div>
-              <div className="w-px bg-border/50" />
+              <div className="w-px h-10 bg-border/70" />
               <div className="text-center">
-                <p className="text-2xl font-serif text-primary">{summary.reserved}</p>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">Reservados</p>
+                <p className="text-3xl md:text-4xl font-serif text-primary font-normal">{summary.reserved}</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-1 font-serif">Reservados</p>
               </div>
-            </Card>
+            </div>
           </div>
         )}
 
@@ -228,7 +238,7 @@ export default function Home() {
                       <TabsTrigger
                         key={cat}
                         value={cat}
-                        className="px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium border border-border/40 transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-glow-primary data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50 data-[state=inactive]:hover:text-foreground  shadow-none"
+                        className="px-5 py-2 text-xs uppercase tracking-[0.2em] font-serif font-medium rounded-none border border-border/60 transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-glow-primary data-[state=inactive]:bg-card/40 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-primary/50 data-[state=inactive]:hover:text-foreground shadow-none"
                       >
                         {cat}
                       </TabsTrigger>
@@ -243,36 +253,36 @@ export default function Home() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
                 {/* Search Bar - Left */}
                 <div className="relative w-full lg:max-w-md flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/70" />
                   <Input 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar presente..." 
-                    className="pl-9 h-10 w-full border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus-visible:ring-1 focus-visible:ring-primary/50 transition-colors"
+                    placeholder="Buscar presentes no acervo..." 
+                    className="pl-9 h-11 w-full rounded-none border-border/70 bg-card/85 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-1 focus-visible:ring-primary/60 focus:border-primary transition-colors font-sans text-sm"
                   />
                 </div>
                 
                 {/* Status and Sort Filters - Right */}
                 <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0 justify-end">
                   <Select value={activeFilter} onValueChange={setActiveFilter}>
-                    <SelectTrigger className="w-full sm:w-[160px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                    <SelectTrigger className="w-full sm:w-[170px] h-11 rounded-none border-border/70 bg-card/85 text-foreground focus:ring-1 focus:ring-primary/60 transition-colors font-serif tracking-wide text-xs uppercase">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-border/60">
-                      <SelectItem value="Todos" className="cursor-pointer">Todos os Status</SelectItem>
-                      <SelectItem value="Disponíveis" className="cursor-pointer">Disponíveis</SelectItem>
-                      <SelectItem value="Reservados" className="cursor-pointer">Reservados</SelectItem>
+                    <SelectContent className="bg-card border-border/80 rounded-none">
+                      <SelectItem value="Todos" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Todos os Status</SelectItem>
+                      <SelectItem value="Disponíveis" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Disponíveis</SelectItem>
+                      <SelectItem value="Reservados" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Reservados</SelectItem>
                     </SelectContent>
                   </Select>
 
                   <Select value={sortOption} onValueChange={(val: any) => setSortOption(val)}>
-                    <SelectTrigger className="w-full sm:w-[180px] h-10 border-border/60 bg-card/30 backdrop-blur-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-colors">
+                    <SelectTrigger className="w-full sm:w-[190px] h-11 rounded-none border-border/70 bg-card/85 text-foreground focus:ring-1 focus:ring-primary/60 transition-colors font-serif tracking-wide text-xs uppercase">
                       <SelectValue placeholder="Ordenar por" />
                     </SelectTrigger>
-                    <SelectContent className="bg-card border-border/60">
-                      <SelectItem value="default" className="cursor-pointer">Ordem Padrão</SelectItem>
-                      <SelectItem value="price-asc" className="cursor-pointer">Menor Preço</SelectItem>
-                      <SelectItem value="price-desc" className="cursor-pointer">Maior Preço</SelectItem>
+                    <SelectContent className="bg-card border-border/80 rounded-none">
+                      <SelectItem value="default" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Ordem Padrão</SelectItem>
+                      <SelectItem value="price-asc" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Menor Preço</SelectItem>
+                      <SelectItem value="price-desc" className="cursor-pointer font-serif text-xs uppercase tracking-wide">Maior Preço</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
