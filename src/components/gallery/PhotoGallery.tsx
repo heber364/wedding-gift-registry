@@ -93,17 +93,23 @@ export function PhotoGallery() {
         <button
           onClick={scrollPrev}
           aria-label="Foto anterior no carrossel"
-          className="absolute left-2 sm:left-6 md:left-10 top-1/2 -translate-y-1/2 z-20 p-3 sm:p-4 rounded-none border border-border/80 bg-background/90 text-foreground hover:text-primary hover:border-primary/80 transition-all duration-300 shadow-2xl shadow-black backdrop-blur-xs"
+          className="group absolute left-1 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 text-foreground/75 hover:text-primary transition-colors duration-300 focus:outline-none select-none"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft
+            strokeWidth={1.5}
+            className="w-8 h-8 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:-translate-x-1.5 group-hover:scale-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+          />
         </button>
 
         <button
           onClick={scrollNext}
           aria-label="Próxima foto no carrossel"
-          className="absolute right-2 sm:right-6 md:right-10 top-1/2 -translate-y-1/2 z-20 p-3 sm:p-4 rounded-none border border-border/80 bg-background/90 text-foreground hover:text-primary hover:border-primary/80 transition-all duration-300 shadow-2xl shadow-black backdrop-blur-xs"
+          className="group absolute right-1 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 text-foreground/75 hover:text-primary transition-colors duration-300 focus:outline-none select-none"
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight
+            strokeWidth={1.5}
+            className="w-8 h-8 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:translate-x-1.5 group-hover:scale-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+          />
         </button>
       </div>
 

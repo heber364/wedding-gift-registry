@@ -94,9 +94,12 @@ export function PhotoLightbox({
             <button
               onClick={handlePrev}
               aria-label="Foto anterior"
-              className="absolute left-2 md:-left-12 z-20 p-3 rounded-none border border-border/60 bg-card/80 text-foreground/80 hover:text-primary hover:border-primary/80 transition-all backdrop-blur-sm"
+              className="group absolute left-2 md:-left-14 z-20 p-2 text-foreground/75 hover:text-primary transition-colors duration-300 focus:outline-none select-none"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft
+                strokeWidth={1.5}
+                className="w-8 h-8 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:-translate-x-1.5 group-hover:scale-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+              />
             </button>
 
             {/* Imagem Ampliada */}
@@ -115,9 +118,12 @@ export function PhotoLightbox({
             <button
               onClick={handleNext}
               aria-label="Próxima foto"
-              className="absolute right-2 md:-right-12 z-20 p-3 rounded-none border border-border/60 bg-card/80 text-foreground/80 hover:text-primary hover:border-primary/80 transition-all backdrop-blur-sm"
+              className="group absolute right-2 md:-right-14 z-20 p-2 text-foreground/75 hover:text-primary transition-colors duration-300 focus:outline-none select-none"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight
+                strokeWidth={1.5}
+                className="w-8 h-8 md:w-11 md:h-11 transition-all duration-300 ease-out group-hover:translate-x-1.5 group-hover:scale-110 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+              />
             </button>
           </div>
 
