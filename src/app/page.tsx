@@ -74,8 +74,8 @@ export default function Home() {
 
     if (searchQuery.trim() !== "") {
       const q = searchQuery.toLowerCase();
-      result = result.filter((g) => 
-        g.name.toLowerCase().includes(q) || 
+      result = result.filter((g) =>
+        g.name.toLowerCase().includes(q) ||
         (g.description && g.description.toLowerCase().includes(q))
       );
     }
@@ -92,19 +92,19 @@ export default function Home() {
       <HeaderNav />
       {/* Hero Header Centralizado Verticalmente */}
       <header id="inicio" className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 py-20 border-b border-border/30 overflow-hidden">
-        {/* Plano de fundo fotográfico do ensaio medieval (1.jpg) */}
+        {/* Plano de fundo fotográfico do ensaio (PREWDG (125).jpg) */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
-            src="/1.jpg"
-            alt="Helloisa & Héber Ensaio Medieval"
+            src="/pre-wedding/PREWDG (125).jpg"
+            alt="Helloisa & Héber Ensaio Pré-Wedding"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_25%] opacity-30 filter contrast-125 brightness-75 mix-blend-luminosity scale-105"
+            className="object-cover object-center opacity-40 filter contrast-105 brightness-95 scale-105"
           />
           {/* Camadas de escurecimento, vinheta e gradientes para legibilidade do texto */}
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-[1px]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.5)_0%,hsl(var(--background))_85%)]" />
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-[0.5px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.25)_0%,hsl(var(--background))_85%)]" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-transparent to-background" />
         </div>
 
@@ -131,12 +131,12 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-3xl w-full my-auto flex flex-col items-center justify-center space-y-6 pt-12 md:pt-16 pb-8">
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight">
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-normal leading-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
             Helloisa <span className="text-primary italic">&amp;</span> Héber
           </h1>
-          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-2 mb-6">
+          <div className="flex items-center justify-center gap-4 text-muted-foreground mt-2 mb-6 drop-shadow-md">
             <span className="w-12 h-px bg-border" />
-            <p className="tracking-widest uppercase text-sm">22 de Novembro de 2026</p>
+            <p className="tracking-widest uppercase text-sm text-foreground/90 font-medium">22 de Novembro de 2026</p>
             <span className="w-12 h-px bg-border" />
           </div>
 
@@ -254,14 +254,14 @@ export default function Home() {
                 {/* Search Bar - Left */}
                 <div className="relative w-full lg:max-w-md flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/70" />
-                  <Input 
+                  <Input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Buscar presentes no acervo..." 
+                    placeholder="Buscar presentes no acervo..."
                     className="pl-9 h-11 w-full rounded-none border-border/70 bg-card/85 text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-1 focus-visible:ring-primary/60 focus:border-primary transition-colors font-sans text-sm"
                   />
                 </div>
-                
+
                 {/* Status and Sort Filters - Right */}
                 <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0 justify-end">
                   <Select value={activeFilter} onValueChange={setActiveFilter}>
